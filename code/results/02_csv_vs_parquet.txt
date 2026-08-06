@@ -1,0 +1,3 @@
+CSV:     398.3 KiB
+Parquet: 8.4 KiB
+Schema({'Time': Int64, 'Price': Int32, 'Volume': Int32, 'BSFlag': Int8, 'date': Int64, 'symbol': String})

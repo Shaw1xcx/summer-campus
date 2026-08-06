@@ -1,0 +1,66 @@
+{
+  "close_rebalance": {
+    "total_return": 1.421049,
+    "annual_return": 1.110218,
+    "annual_volatility": 0.226369,
+    "sharpe_ratio": 3.4172,
+    "max_drawdown": 0.101232
+  },
+  "open_rebalance": {
+    "total_return": 0.127386,
+    "annual_return": 0.106953,
+    "annual_volatility": 0.090462,
+    "sharpe_ratio": 1.1688,
+    "max_drawdown": 0.102597
+  },
+  "factor_evaluation": [
+    {
+      "factor": "成交额标准差对数",
+      "IC_mean": -0.078104,
+      "IC_std": 0.140454,
+      "IR": -0.5561,
+      "ICIR": -0.5561,
+      "Rank_IC_mean": -0.107875,
+      "Rank_IC_std": 0.145741,
+      "Rank_IR": -0.7402,
+      "Rank_ICIR": -0.7402,
+      "IC_win_rate": 0.2534
+    },
+    {
+      "factor": "买卖不平衡",
+      "IC_mean": -0.039797,
+      "IC_std": 0.100518,
+      "IR": -0.3959,
+      "ICIR": -0.3959,
+      "Rank_IC_mean": -0.019091,
+      "Rank_IC_std": 0.102806,
+      "Rank_IR": -0.1857,
+      "Rank_ICIR": -0.1857,
+      "IC_win_rate": 0.348
+    },
+    {
+      "factor": "波动率",
+      "IC_mean": -0.057709,
+      "IC_std": 0.140466,
+      "IR": -0.4108,
+      "ICIR": -0.4108,
+      "Rank_IC_mean": -0.075529,
+      "Rank_IC_std": 0.145155,
+      "Rank_IR": -0.5203,
+      "Rank_ICIR": -0.5203,
+      "IC_win_rate": 0.3446
+    },
+    {
+      "factor": "动量",
+      "IC_mean": -0.026968,
+      "IC_std": 0.165293,
+      "IR": -0.1631,
+      "ICIR": -0.1631,
+      "Rank_IC_mean": -0.056063,
+      "Rank_IC_std": 0.138113,
+      "Rank_IR": -0.4059,
+      "Rank_ICIR": -0.4059,
+      "IC_win_rate": 0.4324
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "number": 1,
+    "returncode": 0,
+    "seconds": 0.797568,
+    "script": "01_prepare_data.py",
+    "log": "01_prepare_data.txt"
+  },
+  {
+    "number": 2,
+    "returncode": 0,
+    "seconds": 0.771242,
+    "script": "02_csv_vs_parquet.py",
+    "log": "02_csv_vs_parquet.txt"
+  },
+  {
+    "number": 3,
+    "returncode": 0,
+    "seconds": 0.947516,
+    "script": "03_compression_benchmark.py",
+    "log": "03_compression_benchmark.txt"
+  },
+  {
+    "number": 4,
+    "returncode": 0,
+    "seconds": 0.652581,
+    "script": "04_partition_by_date.py",
+    "log": "04_partition_by_date.txt"
+  },
+  {
+    "number": 5,
+    "returncode": 0,
+    "seconds": 0.72886,
+    "script": "05_layout_candidates.py",
+    "log": "05_layout_candidates.txt"
+  },
+  {
+    "number": 6,
+    "returncode": 0,
+    "seconds": 0.688836,
+    "script": "06_polars_query_plan.py",
+    "log": "06_polars_query_plan.txt"
+  },
+  {
+    "number": 7,
+    "returncode": 0,
+    "seconds": 0.580742,
+    "script": "07_polars_eager_vs_lazy.py",
+    "log": "07_polars_eager_vs_lazy.txt"
+  },
+  {
+    "number": 8,
+    "returncode": 0,
+    "seconds": 1.677977,
+    "script": "08_duckdb_top3.py",
+    "log": "08_duckdb_top3.txt"
+  },
+  {
+    "number": 9,
+    "returncode": 0,
+    "seconds": 0.361749,
+    "script": "09_duckdb_explain_cases.py",
+    "log": "09_duckdb_explain_cases.txt"
+  },
+  {
+    "number": 10,
+    "returncode": 0,
+    "seconds": 0.282654,
+    "script": "10_cache_basic.py",
+    "log": "10_cache_basic.txt"
+  },
+  {
+    "number": 11,
+    "returncode": 0,
+    "seconds": 0.3512,
+    "script": "11_cache_with_version.py",
+    "log": "11_cache_with_version.txt"
+  },
+  {
+    "number": 12,
+    "returncode": 0,
+    "seconds": 1.708304,
+    "script": "12_zarr_chunks.py",
+    "log": "12_zarr_chunks.txt"
+  },
+  {
+    "number": 13,
+    "returncode": 0,
+    "seconds": 1.881431,
+    "script": "13_threads_cpu_vs_io.py",
+    "log": "13_threads_cpu_vs_io.txt"
+  },
+  {
+    "number": 14,
+    "returncode": 0,
+    "seconds": 0.146514,
+    "script": "14_thread_lock.py",
+    "log": "14_thread_lock.txt"
+  },
+  {
+    "number": 15,
+    "returncode": 0,
+    "seconds": 1.314843,
+    "script": "15_end_to_end.py",
+    "log": "15_end_to_end.txt"
+  }
+]

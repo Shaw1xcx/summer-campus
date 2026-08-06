@@ -1,0 +1,4 @@
+trades: (12000, 6) → data\trades.csv
+factors: (24, 5) → data\factor-values.csv
+thread tasks: (8, 5) → data\thread-tasks.csv
+orders: (2, 3) → data\orders.csv

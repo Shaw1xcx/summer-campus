@@ -1,0 +1,14 @@
+输入: 12000 行 / 6 天 / 8 只股票
+Parquet: 8.4 KiB / 日期文件: 6 个
+第一次查询: CacheInfo(hits=0, misses=1, maxsize=32, currsize=1)
+第二次查询: CacheInfo(hits=1, misses=1, maxsize=32, currsize=1)
+两次结果一致: True
+Polars 与 DuckDB Top 3 一致: True
+20260630 按成交额 Top 3（价格单位：分）:
+  S008: trades=250, volume=111900, turnover=133154600, vwap=1189.94
+  S007: trades=250, volume=111900, turnover=130357100, vwap=1164.94
+  S006: trades=250, volume=111900, turnover=127559600, vwap=1139.94
+并发汇总: 6 天，每天 8 只股票
+Zarr shape/chunks/shards: (6, 8) (1, 4) (2, 8)
+Zarr[20260630, S002] VWAP: 1039.94
+最终缓存: CacheInfo(hits=2, misses=6, maxsize=32, currsize=6)

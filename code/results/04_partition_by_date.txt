@@ -1,0 +1,7 @@
+生成文件数: 6
+ - data\lake\year=2026\month=06\date=20260625\data_0.parquet
+ - data\lake\year=2026\month=06\date=20260626\data_0.parquet
+ - data\lake\year=2026\month=06\date=20260627\data_0.parquet
+ - data\lake\year=2026\month=06\date=20260628\data_0.parquet
+ - data\lake\year=2026\month=06\date=20260629\data_0.parquet
+ - data\lake\year=2026\month=06\date=20260630\data_0.parquet

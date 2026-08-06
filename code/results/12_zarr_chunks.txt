@@ -1,0 +1,9 @@
+source rows: 24
+shape / chunks / shards: (4, 6, 3) (2, 3, 3) (4, 6, 3)
+cube[0,1,0] = 0.02 → 20260627 / S002 / momentum
+exact momentum:
+ [[0.01 0.02 0.03]
+ [0.07 0.08 0.09]]
+exact chunk ids: [(0, 0, 0)] requested: 18 covered: 18
+wide chunk ids : [(0, 0, 0), (0, 1, 0), (1, 0, 0), (1, 1, 0)] requested: 27 covered: 72
+wide read amplification: 2.67 x

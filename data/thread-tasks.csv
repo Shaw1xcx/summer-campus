@@ -1,0 +1,9 @@
+task,kind,seed,rounds,delay_seconds
+CPU-A,cpu,1,1500000,0.0
+CPU-B,cpu,2,1500000,0.0
+CPU-C,cpu,3,1500000,0.0
+CPU-D,cpu,4,1500000,0.0
+IO-A,io,0,0,0.12
+IO-B,io,0,0,0.12
+IO-C,io,0,0,0.12
+IO-D,io,0,0,0.12

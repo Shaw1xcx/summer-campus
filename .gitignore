@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.idea/
+*.iml
+
+# Raw data (too large for git)
+任务/data/
+任务/task.tar.gz
+
+# Generated data output (too large)
+任务/output/minute/
+任务/output/daily/
+任务/output/lstm_v2/features.parquet
+
+# Temporary
+*.log
+*.tmp

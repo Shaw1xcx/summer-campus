@@ -1,0 +1,10 @@
+Free-threaded build: False
+GIL currently enabled: True
+CPU tasks: 4 × 1500000 rounds
+CPU serial / threads: 0.574 / 0.515 s
+CPU thread speedup: 1.11 x
+I/O tasks: 4 × 0.12 s wait
+I/O serial / threads: 0.483 / 0.124 s
+I/O thread speedup: 3.89 x
+CPU results equal: True
+I/O results equal : True

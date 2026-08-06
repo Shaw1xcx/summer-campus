@@ -1,0 +1,2174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>数据处理技术补充</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --ink:#172033; --muted:#65738b; --line:#dce5f2; --paper:#fff;
+      --navy:#10192d; --blue:#2f6fed; --cyan:#08a7b8; --orange:#f08b32;
+      --green:#16856b; --red:#c24b59; --soft:#f4f7fc; --code:#101827;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0; color:var(--ink); background:#eef2f8;
+      font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    .layout { display:grid; grid-template-columns:260px minmax(0,960px); gap:28px; max-width:1290px; margin:auto; padding:24px; }
+    .layout.nav-hidden { grid-template-columns:minmax(0,1fr); }
+    .layout.nav-hidden nav { display:none; }
+    nav {
+      position:sticky; top:18px; align-self:start; max-height:calc(100vh - 36px); overflow:auto;
+      color:#e7eefc; background:var(--navy); border-radius:18px; padding:22px;
+      box-shadow:0 18px 50px #111a2f2b;
+    }
+    nav .brand { font-weight:800; font-size:17px; line-height:1.35; margin-bottom:15px; }
+    nav .brand small { display:block; color:#8fa2c2; font-weight:500; margin-top:5px; }
+    nav a { display:block; color:#b9c7df; text-decoration:none; padding:8px 10px; margin:3px 0; border-radius:8px; }
+    nav a:hover, nav a.active { color:#fff; background:#ffffff14; }
+    button { border:0; border-radius:8px; padding:8px 11px; font:inherit; cursor:pointer; }
+    nav button { color:#eaf2ff; background:#ffffff12; }
+    nav button:hover { background:#ffffff20; }
+    main { min-width:0; }
+    .main-toolbar {
+      position:fixed; top:50%; left:max(0px,calc((100vw - 1290px)/2 + 284px));
+      z-index:40; width:auto; transform:translateY(-50%);
+    }
+    .layout.nav-hidden .main-toolbar { left:max(0px,calc((100vw - 1290px)/2)); }
+    .sidebar-toggle {
+      display:flex; align-items:center; justify-content:center; width:34px; height:64px; padding:0;
+      color:#244d86; background:#e7eef9; border:1px solid #c5d4ea; border-radius:0 11px 11px 0;
+      box-shadow:0 5px 16px #263b5e2b; font-size:29px; font-weight:500; line-height:1;
+    }
+    .sidebar-toggle:hover { background:#d3e1f6; }
+    .hero, .lesson, .closing {
+      background:var(--paper); border:1px solid #e2e8f2; border-radius:18px;
+      box-shadow:0 12px 35px #12213a0b; margin-bottom:22px;
+    }
+    .hero { overflow:hidden; }
+    .hero-top { padding:42px 48px 34px; background:linear-gradient(130deg,#12203b 0%,#173f7b 62%,#087f91 100%); color:#fff; }
+    .eyebrow { text-transform:uppercase; letter-spacing:.13em; font-size:12px; color:#a8dbea; font-weight:800; }
+    h1 { font-size:38px; line-height:1.22; margin:10px 0 14px; }
+    .hero-top p { font-size:18px; color:#d9e7fa; max-width:760px; margin:0; }
+    .hero-body { padding:28px 48px 38px; }
+    .notice { border-left:4px solid var(--orange); background:#fff8ef; padding:13px 16px; border-radius:8px; margin:15px 0; }
+    .priority { display:flex; flex-wrap:wrap; gap:8px; margin:17px 0; }
+    .pill { border-radius:999px; padding:5px 11px; background:#eaf1ff; color:#285ebd; font-weight:700; font-size:13px; }
+    .pill.hot { background:#e5f8f4; color:#087864; }
+    .topic-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:20px; }
+    .topic-grid a { color:inherit; text-decoration:none; border:1px solid var(--line); border-radius:11px; padding:13px; background:#fbfdff; }
+    .topic-grid b { display:block; color:var(--blue); }
+    .lesson { padding:34px 42px 42px; scroll-margin-top:16px; }
+    .lesson-head { border-bottom:1px solid var(--line); padding-bottom:20px; }
+    .topic-no { color:var(--blue); font-size:13px; font-weight:850; letter-spacing:.08em; }
+    h2 { font-size:27px; line-height:1.3; margin:5px 0 7px; }
+    h3 { margin:24px 0 9px; font-size:18px; }
+    h4 { margin:18px 0 7px; font-size:15px; }
+    .subtitle { color:var(--muted); margin:0; }
+    .goal { display:grid; grid-template-columns:1fr; gap:13px; margin:16px 0; }
+    .goal > div { padding:13px 15px; border:1px solid var(--line); border-radius:10px; }
+    .goal b { display:block; margin-bottom:3px; }
+    .plain-example { margin:16px 0; padding:13px 15px; border-left:4px solid var(--orange); border-radius:8px; background:#fff8ef; color:#4f5665; }
+    .plain-example b { color:#8a4b18; }
+    .benefit-block { margin:18px 0; padding:17px; border:1px solid #bcd5cc; border-radius:12px; background:#f5fbf8; }
+    .benefit-block h3 { margin:0 0 4px; color:#176954; }
+    .benefit-lead { margin:0 0 12px; color:#526578; font-size:13px; }
+    .benefit-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+    .benefit-item { padding:11px 12px; border-top:3px solid #79b9a5; background:#fff; }
+    .benefit-item b { display:block; margin-bottom:3px; color:#176954; }
+    .benefit-item p { margin:0; color:#536278; font-size:13px; }
+    .benefit-limit { margin:11px 0 0; padding:10px 12px; border-left:4px solid #e1a05f; border-radius:7px; color:#655344; background:#fff8ef; font-size:13px; }
+    .benefit-limit b { color:#8a4b18; }
+    .foundation { margin:18px 0; padding:18px; border:1px solid #cbd9ec; border-radius:12px; background:#f8fbff; }
+    .foundation h3 { margin:0 0 10px; color:#204f8e; }
+    .foundation p { margin:7px 0; }
+    .term-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:13px 0; }
+    .term-card { padding:12px 13px; border:1px solid #d4dfed; border-radius:9px; background:#fff; }
+    .term-card b { display:block; color:#245795; margin-bottom:3px; }
+    .term-card p { margin:0; color:#536278; font-size:13px; }
+    .walkthrough { display:grid; gap:8px; margin:13px 0; counter-reset:walk; }
+    .walk-step { position:relative; padding:11px 13px 11px 48px; border-radius:9px; background:#edf4fd; color:#3d4f68; }
+    .walk-step::before { counter-increment:walk; content:counter(walk); position:absolute; left:13px; top:10px; display:grid; place-items:center; width:25px; height:25px; border-radius:50%; color:#fff; background:#3975cc; font-weight:800; }
+    .walk-step b { color:#204f8e; }
+    .mini-table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+    .mini-table th,.mini-table td { padding:8px 10px; border:1px solid #d5e0ee; text-align:left; vertical-align:top; }
+    .mini-table th { color:#234f89; background:#eaf2fc; }
+    .data-equation { display:grid; grid-template-columns:repeat(7,auto); gap:7px; align-items:center; justify-content:center; margin:14px 0; }
+    .data-equation span { padding:8px 11px; border-radius:7px; color:#285791; background:#e8f0fc; text-align:center; font-weight:750; }
+    .data-equation i { color:#6a87ad; font-style:normal; font-weight:850; }
+    .layout-cases { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:13px 0; }
+    .layout-case { padding:13px; border:1px solid #cbd9ec; border-radius:9px; background:#fff; }
+    .layout-case-head { display:flex; justify-content:space-between; gap:10px; align-items:baseline; margin-bottom:7px; color:#245795; }
+    .layout-case-head strong { font-size:20px; }
+    .layout-case p { margin:0; color:#536278; font-size:13px; }
+    .file-strip { display:flex; flex-wrap:wrap; gap:4px; margin:9px 0; }
+    .file-strip i { display:block; width:18px; height:24px; border:1px solid #8facd3; border-radius:3px; background:#dfeafb; }
+    .file-strip.dense i { width:11px; height:15px; }
+    .query-matrix th:not(:first-child),.query-matrix td:not(:first-child) { text-align:center; }
+    .query-matrix strong { display:block; color:#1e4f92; font-size:14px; }
+    .query-matrix small { display:block; color:#68778c; line-height:1.35; }
+    .candidate-good { color:#176954; background:#effaf6; }
+    .candidate-warn { color:#8a531f; background:#fff7ed; }
+    .overhead-compare { display:grid; grid-template-columns:1fr auto 1fr; gap:9px; align-items:stretch; margin:12px 0; }
+    .overhead-card { padding:12px; border:1px solid #cbd9ec; border-radius:9px; background:#fff; text-align:center; }
+    .overhead-card b { display:block; color:#285791; }
+    .overhead-card strong { display:block; margin:4px 0; color:#176954; font-size:20px; }
+    .overhead-card small { color:#64748a; }
+    .overhead-vs { display:grid; place-items:center; color:#6686b1; font-weight:850; }
+    .capstone-lanes { display:grid; gap:11px; }
+    .capstone-lane { display:grid; grid-template-columns:92px minmax(0,1fr); gap:10px; align-items:stretch; }
+    .capstone-lane-label { display:grid; place-items:center; padding:9px; border-radius:8px; color:#285791; background:#dfeafb; font-size:12px; font-weight:800; text-align:center; }
+    .capstone-track { display:flex; align-items:stretch; gap:6px; min-width:0; }
+    .capstone-stage { flex:1; min-width:0; padding:9px 7px; border:1px solid #bfd0e8; border-radius:8px; background:#fff; text-align:center; }
+    .capstone-stage b { display:block; color:#285791; font-size:12px; }
+    .capstone-stage small { display:block; margin-top:3px; color:#65748a; font-size:10px; line-height:1.35; overflow-wrap:anywhere; }
+    .capstone-stage.output { border-color:#9ed1c1; background:#dff4ec; }
+    .capstone-stage.output b { color:#176954; }
+    .capstone-arrow { display:grid; place-items:center; flex:0 0 auto; color:#6686b1; font-weight:850; }
+    .topic-role { display:inline-block; min-width:30px; margin-right:5px; padding:1px 5px; border-radius:4px; color:#245795; background:#e5eefb; font-size:11px; font-weight:800; text-align:center; }
+    .why-box { margin:12px 0; padding:12px 14px; border-left:4px solid var(--blue); border-radius:8px; background:#edf4ff; }
+    .why-box b { color:#174a8e; }
+    .knowledge-slide { margin:22px 0; border:1px solid #cbd9ec; border-radius:14px; overflow:hidden; background:#fbfdff; break-inside:avoid; }
+    .knowledge-title { display:flex; justify-content:space-between; gap:18px; align-items:baseline; padding:13px 17px; color:#edf5ff; background:linear-gradient(115deg,#182b4b,#205ca1); }
+    .knowledge-title b { font-size:17px; }
+    .knowledge-title span { color:#c6daf5; font-size:12px; }
+    .knowledge-body { display:grid; grid-template-columns:minmax(230px,.82fr) minmax(360px,1.35fr); gap:20px; padding:20px; }
+    .concept-copy { display:grid; align-content:start; gap:12px; }
+    .concept-item { padding-bottom:10px; border-bottom:1px solid var(--line); }
+    .concept-item:last-child { border-bottom:0; padding-bottom:0; }
+    .concept-item b { display:block; margin-bottom:3px; color:#1e4f92; }
+    .concept-item p { margin:0; color:#44546c; font-size:13px; }
+    .visual-panel { min-width:0; display:grid; align-content:center; gap:10px; padding:16px; background:#f0f5fc; border-radius:11px; }
+    .visual-label { color:#52647e; font-size:12px; font-weight:750; text-transform:uppercase; letter-spacing:.06em; }
+    .diagram-flow { display:flex; align-items:stretch; justify-content:center; gap:8px; }
+    .diagram-node { flex:1; min-width:0; padding:10px; border:1px solid #bfd0e8; border-radius:8px; background:#fff; text-align:center; }
+    .diagram-node strong { display:block; color:#1c4d91; }
+    .diagram-node small { display:block; margin-top:3px; color:#63738a; line-height:1.35; }
+    .diagram-arrow { display:flex; align-items:center; color:#5682c4; font-size:20px; font-weight:800; }
+    .metric-line { display:flex; align-items:center; gap:8px; font-size:12px; color:#51627b; }
+    .metric-line span:first-child { width:86px; flex:0 0 auto; }
+    .meter { flex:1; height:10px; background:#d9e3f1; border-radius:99px; overflow:hidden; }
+    .meter i { display:block; height:100%; background:#3975cc; border-radius:inherit; }
+    .storage-stack { display:grid; gap:8px; margin:12px 0; }
+    .storage-layer { padding:11px 12px; border:1px solid #c7d6ea; border-radius:9px; background:#fff; }
+    .storage-layer > b { display:block; margin-bottom:7px; color:#244f89; }
+    .storage-layer > small { display:block; margin-top:6px; color:#63738a; line-height:1.5; }
+    .storage-techs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+    .storage-tech { padding:8px; border-radius:7px; background:#e8f0fc; color:#2a578f; text-align:center; font-size:12px; font-weight:750; }
+    .storage-tech.current { color:#176a56; background:#def4ec; }
+    .storage-tech.array { color:#81521d; background:#fff0df; }
+    .storage-down { color:#6587b5; text-align:center; font-size:20px; font-weight:850; line-height:1; }
+    .popularity-list { display:grid; gap:7px; }
+    .popularity-row { display:grid; grid-template-columns:66px minmax(80px,1fr) 132px; gap:8px; align-items:center; color:#43546b; font-size:12px; }
+    .popularity-row b { color:#244f89; }
+    .popularity-row b small { display:block; color:#7a899d; font-size:9px; font-weight:650; line-height:1.2; }
+    .popularity-track { height:11px; overflow:hidden; border-radius:99px; background:#dce5f2; }
+    .popularity-track i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#3975cc,#08a7b8); }
+    .popularity-number { text-align:right; font-variant-numeric:tabular-nums; }
+    .number-note { margin-top:10px; color:#64748a; font-size:11px; line-height:1.55; }
+    .file-lines { display:grid; gap:4px; margin-top:7px; text-align:left; font:11px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; color:#43536a; }
+    .file-lines span { display:block; padding:4px 6px; border-radius:4px; background:#eef2f7; overflow:hidden; white-space:nowrap; }
+    .storage-layout { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:13px 0; }
+    .storage-layout.expanded { grid-template-columns:1fr; }
+    .storage-card { min-width:0; padding:13px; border:1px solid #d2deed; border-radius:9px; background:#fff; }
+    .storage-card > b { display:block; color:#245795; margin-bottom:7px; }
+    .storage-bytes { display:grid; gap:5px; color:#3d4d64; font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .storage-bytes span { display:block; padding:6px 8px; border-radius:5px; background:#edf3fa; overflow-wrap:anywhere; }
+    .storage-bytes .skip-block { color:#8c6a55; background:#fff2e9; text-decoration:line-through; }
+    .storage-bytes .read-block { color:#176954; background:#e3f5ee; }
+    .pq-lead { margin:6px 0 13px; color:#43536a; }
+    .pq-steps { display:grid; gap:9px; }
+    .pq-step { display:grid; grid-template-columns:112px minmax(0,1fr); gap:12px; align-items:start; padding:12px; border-radius:9px; background:#f1f5fb; }
+    .pq-step-label { color:#244f89; font-weight:800; line-height:1.45; }
+    .pq-step-label small { display:block; margin-top:3px; color:#75849a; font-size:10px; font-weight:650; }
+    .pq-step-body { min-width:0; }
+    .pq-step-body > p { margin:0 0 8px; color:#536278; font-size:12px; }
+    .pq-rowgroups { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .pq-rg { min-width:0; padding:9px; border:1px solid #c9d7e9; border-radius:7px; background:#fff; }
+    .pq-rg > b { display:block; margin-bottom:5px; color:#285791; }
+    .pq-rg code { display:block; padding:3px 5px; color:#42536a; background:#edf2f8; border-radius:4px; font-size:11px; overflow-wrap:anywhere; }
+    .pq-rg code + code { margin-top:4px; }
+    .pq-columns { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+    .pq-col { min-width:0; padding:8px 5px; border-radius:7px; color:#3f536d; background:#e5ecf6; text-align:center; font-size:11px; }
+    .pq-col b { display:block; margin-bottom:3px; color:#285791; }
+    .pq-col.focus { color:#176954; background:#dff4ec; box-shadow:inset 0 0 0 1px #acd7c9; }
+    .pq-page { display:grid; grid-template-columns:145px minmax(0,1fr); gap:8px; padding:9px; border:1px solid #b9d6cc; border-radius:7px; background:#f8fcfa; }
+    .pq-page b { color:#176954; }
+    .pq-page code { min-width:0; padding:7px; color:#3f536d; background:#e6f3ee; border-radius:5px; white-space:normal; overflow-wrap:anywhere; }
+    .pq-footer { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+    .pq-footer span { min-width:0; padding:8px; border-radius:6px; color:#43546b; background:#e8eef7; font-size:11px; }
+    .pq-footer b { display:block; color:#285791; }
+    .pq-query-path { display:flex; align-items:stretch; gap:6px; margin-top:11px; }
+    .pq-query-path span { flex:1; display:grid; place-items:center; min-width:0; padding:8px 5px; border-radius:6px; color:#3f536d; background:#e8eef7; text-align:center; font-size:11px; }
+    .pq-query-path span.skip { color:#8c6a55; background:#fff2e9; }
+    .pq-query-path span.read { color:#176954; background:#dff4ec; }
+    .pq-query-path i { display:grid; place-items:center; color:#6487b7; font-style:normal; font-weight:850; }
+    .pq-definition { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:11px; }
+    .pq-definition div { padding:8px; border-top:3px solid #9bb7dc; color:#536278; background:#f4f7fb; font-size:11px; }
+    .pq-definition b { display:block; color:#285791; }
+    .formula-line { margin:12px 0; padding:11px 13px; border-radius:8px; background:#eaf2ff; color:#244d86; font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace; overflow-wrap:anywhere; }
+    .column-blocks { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-top:7px; }
+    .column-blocks div { min-width:0; padding:6px 3px; border-radius:5px; background:#e6effd; color:#345b91; font-size:10px; font-weight:750; }
+    .column-blocks i { display:block; height:5px; margin-top:4px; border-radius:4px; background:#80a8e2; opacity:.85; }
+    .chunk-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:5px; padding:7px; border-radius:8px; background:#dfe8f4; }
+    .chunk-grid span { aspect-ratio:1.5; border-radius:5px; background:#b8cce6; }
+    .chunk-grid span.hit { background:#3975cc; box-shadow:inset 0 0 0 2px #214f92; }
+    .axis-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
+    .axis-card { padding:10px; border:1px solid #cbd8e9; border-radius:8px; background:#fff; }
+    .axis-card b { display:block; color:#285791; }
+    .axis-card code { display:block; margin:5px 0; padding:5px 7px; border-radius:5px; color:#43546b; background:#edf2f8; font-size:11px; overflow-wrap:anywhere; }
+    .axis-card small { color:#64748a; }
+    .cube-coordinate { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; margin:12px 0; }
+    .cube-coordinate > div { padding:10px; border-radius:8px; background:#e9f1fc; color:#42536a; text-align:center; }
+    .cube-coordinate b { display:block; color:#285791; }
+    .cube-coordinate i { color:#6587b6; font-size:20px; font-style:normal; font-weight:850; }
+    .cube-map { display:grid; grid-template-columns:88px 1fr 1fr; gap:6px; margin:10px 0; }
+    .cube-map > div { min-width:0; padding:9px; border-radius:7px; background:#e7eef8; color:#43546b; font-size:11px; text-align:center; }
+    .cube-map .cube-head { display:grid; place-items:center; color:#285791; background:#dbe7f7; font-weight:800; }
+    .cube-map .cube-cell { border:1px solid #bfd0e6; background:#fff; }
+    .cube-map .cube-cell.exact { color:#176954; border-color:#9ed1c1; background:#dff4ec; }
+    .cube-map .cube-cell b { display:block; color:#285791; }
+    .cube-map .cube-cell.exact b { color:#176954; }
+    .cube-map .cube-cell small { display:block; margin-top:3px; color:#6a7890; }
+    .io-equation { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:10px 0; }
+    .io-equation div { padding:10px; border-radius:8px; color:#43546b; background:#e8eef7; text-align:center; }
+    .io-equation b { display:block; color:#285791; font-size:17px; }
+    .shard-pack { padding:12px; border:2px solid #83a7d6; border-radius:10px; background:#eef4fc; }
+    .shard-pack > b { display:block; margin-bottom:8px; color:#285791; text-align:center; }
+    .shard-pack-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .shard-pack-grid span { padding:8px; border-radius:6px; color:#43546b; background:#fff; text-align:center; font-size:11px; }
+    .gil-definition { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:12px 0; }
+    .gil-definition div { padding:10px; border-top:3px solid #91afd7; background:#f3f7fc; color:#536278; font-size:12px; }
+    .gil-definition b { display:block; color:#285791; }
+    .timeline { display:grid; gap:10px; margin:12px 0; }
+    .timeline-case { padding:10px; border:1px solid #cbd8e9; border-radius:9px; background:#fff; }
+    .timeline-case > b { display:block; margin-bottom:7px; color:#285791; }
+    .timeline-row { display:grid; grid-template-columns:72px minmax(0,1fr); gap:7px; align-items:center; margin-top:5px; color:#65748a; font-size:11px; }
+    .timeline-track { display:grid; grid-template-columns:repeat(8,1fr); gap:3px; }
+    .timeline-slot { min-height:24px; display:grid; place-items:center; border-radius:4px; color:#4a5b72; background:#e7edf6; font-size:10px; }
+    .timeline-slot.a { color:#174f8c; background:#dce9fb; }
+    .timeline-slot.b { color:#176954; background:#dff4ec; }
+    .timeline-slot.wait { color:#8c6a55; background:#fff0e5; }
+    .timeline-slot.idle { color:#909bad; background:#f0f2f6; }
+    .gil-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin:11px 0; counter-reset:gil; }
+    .gil-flow div { position:relative; padding:32px 9px 9px; border-radius:8px; color:#4a5a70; background:#eaf1fb; font-size:11px; }
+    .gil-flow div::before { counter-increment:gil; content:counter(gil); position:absolute; top:7px; left:9px; display:grid; place-items:center; width:19px; height:19px; border-radius:50%; color:#fff; background:#3975cc; font-weight:800; }
+    .gil-flow b { display:block; color:#285791; }
+    .tree { font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; color:#3c4f69; }
+    .tree .scan { display:block; margin:2px 0; padding:3px 6px; border-radius:4px; background:#dff4eb; color:#176a56; font-weight:750; }
+    .tree .skip { display:block; margin:2px 0; padding:3px 6px; border-radius:4px; color:#8995a7; text-decoration:line-through; }
+    .plan-compare { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .plan-lane { padding:10px; border:1px solid #c7d5e8; border-radius:8px; background:#fff; }
+    .plan-lane h4 { margin:0 0 8px; color:#274f87; }
+    .plan-step { position:relative; margin:0 0 14px; padding:7px 8px; border-radius:6px; background:#edf3fb; color:#43546b; font-size:12px; text-align:center; }
+    .plan-step:not(:last-child)::after { content:'↓'; position:absolute; left:50%; bottom:-15px; transform:translateX(-50%); color:#6c8fbd; font-weight:800; }
+    .plan-step.good { background:#def4ec; color:#176d58; }
+    .plan-step.costly { background:#fff0e7; color:#9b5422; }
+    .operator-tree { display:grid; justify-items:center; gap:8px; }
+    .operator { min-width:190px; padding:8px 12px; border:1px solid #bfcfe4; border-radius:7px; background:#fff; text-align:center; font-size:12px; }
+    .operator strong { color:#254f89; }
+    .operator:not(:last-child)::after { content:'↓'; display:block; height:11px; margin-bottom:-18px; color:#6c8fbd; font-weight:800; }
+    .branch-flow { display:grid; grid-template-columns:1fr auto 1fr; gap:9px; align-items:center; }
+    .branch { display:grid; gap:8px; }
+    .branch .hit { background:#def4ec; border-color:#aad9ca; color:#176d58; }
+    .branch .miss { background:#fff0e7; border-color:#efc9ad; color:#944f20; }
+    .key-chip { padding:8px 10px; border-radius:7px; background:#dfeafe; color:#2e5f9f; font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace; text-align:center; }
+    .slide-caption { padding:0 20px 17px; color:#627289; font-size:12px; }
+    .demo { border:1px solid #cad9ee; border-radius:12px; overflow:hidden; margin:16px 0; }
+    .demo-title { display:flex; justify-content:space-between; align-items:center; padding:9px 13px; background:#edf3fc; font-weight:750; }
+    .copy { background:#d9e6fa; color:#214f99; font-size:12px; padding:5px 9px; }
+    .install-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0 16px; }
+    .install-grid .demo { display:grid; grid-template-rows:auto 1fr; margin:0; }
+    .install-grid .demo-title span { display:grid; line-height:1.35; }
+    .install-grid .demo-title small { color:var(--muted); font-weight:500; }
+    .install-grid pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    pre { margin:0; padding:17px; overflow:auto; color:#dbe9ff; background:var(--code); font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; tab-size:4; }
+    .run-result { margin:-7px 0 18px; border:1px solid #b9ddcf; border-radius:10px; overflow:hidden; background:#f4fbf8; }
+    .run-result-head { display:flex; justify-content:space-between; gap:14px; align-items:center; padding:8px 13px; color:#176853; background:#e3f5ee; font-size:12px; font-weight:750; }
+    .run-result pre { max-height:360px; padding:13px 15px; color:#20372f; background:#f8fcfa; white-space:pre; font-size:12px; line-height:1.5; }
+    .run-result .run-note { margin:0; padding:9px 13px; border-top:1px solid #d8ebe4; color:#567168; font-size:12px; }
+    details.run-result { padding:0; }
+    details.run-result summary { display:flex; justify-content:space-between; gap:12px; padding:9px 13px; color:#176853; background:#e3f5ee; list-style-position:inside; }
+    details.run-result[open] summary { border-bottom:1px solid #cfe6dd; }
+    details.run-result pre { border:0; }
+    code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+    p code, li code { background:#edf2f8; padding:2px 5px; border-radius:5px; color:#28476f; }
+    .observe { padding:13px 15px; border-radius:9px; background:#eefaf7; border-left:4px solid var(--green); }
+    .question { margin:18px 0; color:#244b7f; padding:13px 15px; background:#eef5ff; border-radius:9px; }
+    .question b { color:#184a8e; }
+    details { border:1px solid var(--line); border-radius:9px; padding:10px 13px; margin-top:14px; }
+    summary { cursor:pointer; font-weight:750; }
+    .closing { padding:36px 44px; }
+    .source-list { font-size:13px; color:var(--muted); }
+    .source-list a { color:#2d64c4; }
+    .small { color:var(--muted); font-size:13px; }
+    .kbd { border:1px solid #cfd8e6; border-bottom-width:2px; background:#fff; border-radius:5px; padding:1px 5px; font-size:12px; }
+    @media (max-width:900px) {
+      .layout { display:block; padding:10px; }
+      nav { position:relative; max-height:none; margin-bottom:12px; }
+      .main-toolbar,.layout.nav-hidden .main-toolbar { left:0; }
+      .sidebar-toggle { width:32px; height:56px; font-size:27px; }
+      nav a { display:inline-block; }
+      .hero-top,.hero-body,.lesson,.closing { padding-left:20px; padding-right:20px; }
+      h1 { font-size:30px; }
+      .topic-grid { grid-template-columns:1fr 1fr; }
+      .goal { grid-template-columns:1fr; }
+      .knowledge-body { grid-template-columns:1fr; }
+      .knowledge-title { display:block; }
+      .knowledge-title span { display:block; margin-top:3px; }
+      .diagram-flow,.branch-flow { display:grid; grid-template-columns:1fr; }
+      .diagram-arrow { justify-content:center; transform:rotate(90deg); }
+      .plan-compare { grid-template-columns:1fr; }
+      .install-grid { grid-template-columns:1fr; }
+      .term-grid { grid-template-columns:1fr; }
+      .benefit-grid { grid-template-columns:1fr; }
+      .storage-layout { grid-template-columns:1fr; }
+      .pq-step { grid-template-columns:1fr; }
+      .pq-rowgroups,.pq-footer,.pq-definition { grid-template-columns:1fr; }
+      .pq-columns { grid-template-columns:1fr 1fr; }
+      .pq-page { grid-template-columns:1fr; }
+      .pq-query-path { display:grid; grid-template-columns:1fr; }
+      .pq-query-path i { transform:rotate(90deg); }
+      .axis-cards,.gil-definition,.gil-flow { grid-template-columns:1fr; }
+      .cube-coordinate { grid-template-columns:1fr; }
+      .cube-coordinate i { transform:rotate(90deg); }
+      .cube-map { grid-template-columns:70px 1fr 1fr; }
+      .io-equation { grid-template-columns:1fr; }
+      .storage-techs { grid-template-columns:1fr; }
+      .popularity-row { grid-template-columns:58px minmax(70px,1fr) 104px; }
+      .mini-table { table-layout:fixed; }
+      .mini-table th,.mini-table td { padding:6px; overflow-wrap:anywhere; }
+      .data-equation { grid-template-columns:1fr; }
+      .data-equation i { text-align:center; transform:rotate(90deg); }
+      .layout-cases,.overhead-compare { grid-template-columns:1fr; }
+      .overhead-vs { transform:rotate(90deg); }
+      .capstone-lane { grid-template-columns:1fr; }
+      .capstone-track { display:grid; grid-template-columns:1fr; }
+      .capstone-arrow { transform:rotate(90deg); }
+    }
+    @media print {
+      body { background:#fff; }
+      .layout { display:block; max-width:none; padding:0; }
+      nav,.main-toolbar,.copy { display:none!important; }
+      .hero,.lesson,.closing { box-shadow:none; break-inside:avoid; }
+      .lesson { break-before:page; }
+      .hero-top { color:#111; background:#fff; border-bottom:2px solid #111; }
+      .hero-top p,.eyebrow { color:#333; }
+      pre { white-space:pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <nav id="chapterNav" aria-label="章节导航">
+    <div class="brand">数据处理技术补充
+      <small>8 个主题</small>
+    </div>
+    <a href="#overview">概览与准备</a>
+    <a href="#t1">T1 编码、压缩与序列化</a>
+    <a href="#t2">T2 Parquet 文件怎样拆分</a>
+    <a href="#t3">T3 Polars 性能工程</a>
+    <a href="#t4">T4 DuckDB 查询引擎</a>
+    <a href="#t5">T5 缓存设计</a>
+    <a href="#t6">T6 Zarr 多维数组</a>
+    <a href="#t7">T7 Free-threaded Python</a>
+    <a href="#t8">T8 完整贯穿例子</a>
+    <a href="#references">参考文献</a>
+  </nav>
+
+  <main>
+    <div class="main-toolbar">
+      <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-controls="chapterNav" aria-expanded="true" aria-label="隐藏目录"><span class="toggle-icon" aria-hidden="true">‹</span></button>
+    </div>
+    <section class="hero" id="overview">
+      <div class="hero-top">
+        <div class="eyebrow">Supplementary Data Processing Techniques</div>
+        <h1>数据处理技术补充</h1>
+      </div>
+      <div class="hero-body">
+        <div class="priority">
+          <span class="pill hot">重点工具：Polars Lazy API</span>
+          <span class="pill hot">重点工具：DuckDB + Parquet</span>
+          <span class="pill">系统设计：缓存一致性</span>
+          <span class="pill">多维数组：Zarr 3</span>
+          <span class="pill">并行执行：Free-threaded Python</span>
+        </div>
+        <div class="topic-grid">
+          <a href="#t1"><b>T1 数据表示</b>编码、压缩、序列化</a>
+          <a href="#t2"><b>T2 文件怎样拆分</b>Parquet、分区剪枝、小文件</a>
+          <a href="#t3"><b>T3 懒执行与优化</b>Polars、Lazy API、下推</a>
+          <a href="#t4"><b>T4 分析型查询</b>DuckDB、SQL、执行计划</a>
+          <a href="#t5"><b>T5 缓存一致性</b>LRU、数据版本、失效</a>
+          <a href="#t6"><b>T6 多维数组存储</b>Zarr 3、Chunk、Shard</a>
+          <a href="#t7"><b>T7 并行执行</b>GIL、线程、Free-threaded Python</a>
+          <a href="#t8"><b>T8 完整贯穿例子</b>从 CSV 到分区、查询、缓存与 Zarr</a>
+        </div>
+        <h3>课堂演示环境准备</h3>
+        <p class="small"><b>步骤 1 · 安装依赖（三选一）：</b>根据自己使用的 Python 环境选择一种方式即可，不要把三条命令全部执行。以下命令都在系统终端或编辑器内置终端中运行。</p>
+        <div class="install-grid" aria-label="三种依赖安装方式">
+          <div class="demo">
+            <div class="demo-title"><span>pip<small>普通 Python 环境</small></span><button class="copy">复制</button></div>
+            <pre><code># 将依赖安装到“当前 python”对应的环境中。
+python -m pip install polars duckdb pyarrow numpy zarr</code></pre>
+          </div>
+          <div class="demo">
+            <div class="demo-title"><span>conda<small>进入已有的 Conda 环境</small></span><button class="copy">复制</button></div>
+            <pre><code># 先进入课程使用的已有环境，避免安装到 base 环境。
+conda activate quant-course
+# 从 conda-forge 安装本讲义使用的数据处理库。
+conda install -c conda-forge polars duckdb pyarrow numpy zarr</code></pre>
+          </div>
+          <div class="demo">
+            <div class="demo-title"><span>uv<small>已初始化的 uv 项目</small></span><button class="copy">复制</button></div>
+            <pre><code># 写入 pyproject.toml、更新锁文件并同步项目环境。
+uv add polars duckdb pyarrow numpy zarr</code></pre>
+          </div>
+        </div>
+        <div class="demo">
+          <div class="demo-title"><span>步骤 2 · 生成本讲义专用的自编小数据</span><button class="copy">复制</button></div>
+          <pre><code>from pathlib import Path
+import polars as pl
+
+# 所有数字都是为了课堂演示自行构造的，不读取课程作业源文件。
+root = Path("data")
+root.mkdir(exist_ok=True)
+
+# 一、交易表：6 天 × 8 只虚构股票 × 每天每只 250 笔 = 12,000 行。
+dates = ["20260625", "20260626", "20260627",
+         "20260628", "20260629", "20260630"]
+symbols = [f"S{i:03d}" for i in range(1, 9)]
+rows = []
+for day_no, day in enumerate(dates):
+    for symbol_no, symbol in enumerate(symbols):
+        base_price = 1000 + symbol_no * 25 + day_no * 3
+        for trade_no in range(250):
+            rows.append({
+                "Time": 93_000_000 + trade_no * 1_000 + symbol_no,
+                "Price": base_price + trade_no % 11 - 5,
+                "Volume": (trade_no % 8 + 1) * 100,
+                "BSFlag": trade_no % 3,
+                "date": day,
+                "symbol": symbol,
+            })
+
+trades = pl.DataFrame(rows).cast({
+    "Time": pl.Int64, "Price": pl.Int32,
+    "Volume": pl.Int32, "BSFlag": pl.Int8,
+})
+trades.write_csv(root / "trades.csv")
+trades.write_parquet(
+    root / "trades.parquet", compression="zstd", statistics=True
+)
+
+# 二、因子表：4 天 × 6 只虚构股票，每个坐标有 3 个手工公式生成的因子。
+factor_rows = []
+for day_no, day in enumerate(dates[-4:]):
+    for symbol_no, symbol in enumerate(symbols[:6]):
+        factor_rows.append({
+            "date": day,
+            "symbol": symbol,
+            "momentum": round((day_no * 6 + symbol_no + 1) / 100, 2),
+            "volatility": round(0.20 + day_no * 0.02 + symbol_no * 0.01, 2),
+            "quality": round(1.00 + symbol_no * 0.10 - day_no * 0.05, 2),
+        })
+factors = pl.DataFrame(factor_rows)
+factors.write_csv(root / "factor-values.csv")
+
+# 三、线程任务表：4 个 CPU 任务和 4 个模拟 I/O 等待任务。
+tasks = pl.DataFrame({
+    "task": ["CPU-A", "CPU-B", "CPU-C", "CPU-D",
+             "IO-A", "IO-B", "IO-C", "IO-D"],
+    "kind": ["cpu"] * 4 + ["io"] * 4,
+    "seed": [1, 2, 3, 4, 0, 0, 0, 0],
+    "rounds": [1_500_000] * 4 + [0] * 4,
+    "delay_seconds": [0.0] * 4 + [0.12] * 4,
+})
+tasks.write_csv(root / "thread-tasks.csv")
+
+# 四、竞态条件订单：库存只有 10，两张订单都想购买 7。
+orders = pl.DataFrame({
+    "order": ["Order-A", "Order-B"],
+    "initial_stock": [10, 10],
+    "quantity": [7, 7],
+})
+orders.write_csv(root / "orders.csv")
+
+print("trades:", trades.shape, "→", root / "trades.csv")
+print("factors:", factors.shape, "→", root / "factor-values.csv")
+print("thread tasks:", tasks.shape, "→", root / "thread-tasks.csv")
+print("orders:", orders.shape, "→", root / "orders.csv")</code></pre>
+        </div>
+        <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · Python 3.14.3</span></div><pre>trades: (12000, 6) → data/trades.csv
+factors: (24, 5) → data/factor-values.csv
+thread tasks: (8, 5) → data/thread-tasks.csv
+orders: (2, 3) → data/orders.csv</pre><p class="run-note">四份数据全部由脚本生成：交易表用于 T1–T5 与 T8，因子表用于 T6，线程任务与订单表用于 T7。</p></div>
+        <p class="small">完整代码位于 <code>code/demos/01_prepare_data.py</code>。pip/Conda 环境执行 <code>python code/demos/01_prepare_data.py</code>，uv 项目执行 <code>uv run python code/demos/01_prepare_data.py</code>。所有输入与演示生成物统一放在 <code>data</code> 文件夹，不读取或修改课程作业源数据。</p>
+      </div>
+    </section>
+
+    <section class="lesson" id="t1">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 01 · REPRESENTATION</div><h2>编码、压缩与序列化</h2><p class="subtitle">比较同一份逻辑数据在 CSV 和 Parquet 中的类型信息、存储空间与读写成本。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>理解序列化是将内存中的数据结构转换为可存储形式的过程；能解释为什么 Parquet 不等同于“压缩过的 CSV”。</div></div>
+      <div class="plain-example"><b>直观例子：</b>CSV 像把表格逐行抄成文字：数字 <code>1178</code> 会保存为四个字符。Parquet 则知道这一列是整数，会按整数列组织，再进行编码和压缩。因此 Parquet 不只是“把 CSV 压缩一下”。</div>
+      <div class="benefit-block">
+        <h3>这种表示方式有什么好处</h3>
+        <p class="benefit-lead">Parquet 的价值来自“保留类型 + 按列组织 + 编码压缩 + 元数据”，不是只把文件后缀换掉。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>少读无关列</b><p>查询只需要 <code>symbol</code> 和 <code>Volume</code> 时，可以不读取 Price、Time 等列；CSV 通常仍要解析每一行。</p></div>
+          <div class="benefit-item"><b>减少磁盘与网络字节</b><p>同类型值连续排列，更容易使用字典、RLE、Delta 和 ZSTD 等方法缩小数据；读取和传输的字节也随之减少。</p></div>
+          <div class="benefit-item"><b>避免反复猜类型</b><p>整数、字符串和 Schema 被写入文件。读取器不必每次从文本重新判断类型，也更容易发现字段不一致。</p></div>
+          <div class="benefit-item"><b>查询前还能继续排除</b><p>Footer 和行组统计可记录最小值、最大值等信息；条件不可能命中的行组可以直接跳过。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>Parquet 不适合人工直接编辑，写入逻辑比 CSV 复杂；只有几行数据或主要用于跨系统文本交换时，CSV 仍可能更直接。</p>
+      </div>
+      <div class="foundation">
+        <h3>Parquet 本身是什么</h3>
+        <p><b>Apache Parquet 是一种用于保存表格数据的列式二进制文件格式。</b>它和 CSV、Excel 文件一样，是“数据如何写进文件”的规格；它不是 Python 库、不是数据库服务，也不会自己执行查询。Polars、DuckDB、Pandas 和 Spark 都可以读写 Parquet。</p>
+        <div class="term-grid">
+          <div class="term-card"><b>列式存储</b><p>同一列的值放在一起。查询只需 <code>symbol</code>、<code>Price</code> 时，引擎可以不读其他列。</p></div>
+          <div class="term-card"><b>保留类型与 Schema</b><p>文件会记住某列是整数、浮点数还是字符串，读取时不必像 CSV 那样从文字重新猜测。</p></div>
+          <div class="term-card"><b>适合分析型读取</b><p>常见分析只读少数列，却要扫描很多行。Parquet 的列组织方式就是为这类工作负载设计的。</p></div>
+          <div class="term-card"><b>不适合频繁修改单行</b><p>Parquet 更像“按批发布的分析文件”。如果要频繁插入、更新某一行，通常由数据库负责。</p></div>
+        </div>
+        <div class="why-box"><b>一句话区分：</b>Parquet 负责“怎么存”；Polars 和 DuckDB 负责“怎么读和算”；ZSTD 或 Snappy 负责“字节怎么压缩”。</div>
+      </div>
+      <div class="foundation">
+        <h3>形式化例子：同一张表如何变成不同的磁盘字节</h3>
+        <p>从操作系统角度看，CSV 和 Parquet 最终都是一串字节。区别在于<b>文件格式规定这串字节怎样排列、怎样分块，以及附带哪些元数据</b>。设逻辑表为：</p>
+        <div class="formula-line">R(Time: int64, Price: int32, Volume: int32, BSFlag: int8)</div>
+        <table class="mini-table"><thead><tr><th>行</th><th>Time</th><th>Price</th><th>Volume</th><th>BSFlag</th></tr></thead><tbody>
+          <tr><td>r₁</td><td>92500810</td><td>1178</td><td>100</td><td>2</td></tr>
+          <tr><td>r₂</td><td>93000120</td><td>1180</td><td>200</td><td>0</td></tr>
+          <tr><td>r₃</td><td>93101540</td><td>1179</td><td>500</td><td>1</td></tr>
+          <tr><td>r₄</td><td>93200410</td><td>1182</td><td>900</td><td>1</td></tr>
+        </tbody></table>
+        <div class="storage-layout expanded">
+          <div class="storage-card">
+            <b>CSV：按行编码的 UTF-8 文本流</b>
+            <div class="storage-bytes">
+              <span>Time,Price,Volume,BSFlag\n</span>
+              <span>92500810,1178,100,2\n</span>
+              <span>93000120,1180,200,0\n</span>
+              <span>93101540,1179,500,1\n</span>
+              <span>93200410,1182,900,1\n</span>
+            </div>
+            <p class="small">一行记录的四个字段相邻；<code>1178</code> 保存为字符 <code>'1''1''7''8'</code>。逗号和换行符用来识别字段边界。</p>
+          </div>
+          <div class="storage-card">
+            <b>Parquet：先横着切成“几批行”，再在每批内部按列存放</b>
+            <p class="pq-lead">下面仍然使用上方的 4 行数据。为了看清结构，假设每 2 行组成一个 Row Group。真实文件的行组通常包含很多行。</p>
+            <div class="pq-steps">
+              <div class="pq-step">
+                <div class="pq-step-label">第 1 步<br>切成 Row Group<small>每组仍是完整的行</small></div>
+                <div class="pq-step-body">
+                  <p>先按行数把表横向切开：RG₁ 管理 r₁–r₂，RG₂ 管理 r₃–r₄。此时还没有丢掉任何列。</p>
+                  <div class="pq-rowgroups">
+                    <div class="pq-rg"><b>RG₁ · 第 1–2 行</b><code>r₁ = [92500810, 1178, 100, 2]</code><code>r₂ = [93000120, 1180, 200, 0]</code></div>
+                    <div class="pq-rg"><b>RG₂ · 第 3–4 行</b><code>r₃ = [93101540, 1179, 500, 1]</code><code>r₄ = [93200410, 1182, 900, 1]</code></div>
+                  </div>
+                </div>
+              </div>
+              <div class="pq-step">
+                <div class="pq-step-label">第 2 步<br>组内按列拆开<small>得到 Column Chunk</small></div>
+                <div class="pq-step-body">
+                  <p>现在只放大 RG₂。它有 4 列，所以产生 4 个 Column Chunk。<b>Column Chunk 不是“整张表的一列”，而是“某一个行组中的某一列”。</b></p>
+                  <div class="pq-columns">
+                    <div class="pq-col"><b>RG₂.Time</b>[93101540,<br>93200410]</div>
+                    <div class="pq-col focus"><b>RG₂.Price</b>[1179, 1182]</div>
+                    <div class="pq-col focus"><b>RG₂.Volume</b>[500, 900]</div>
+                    <div class="pq-col"><b>RG₂.BSFlag</b>[1, 1]</div>
+                  </div>
+                </div>
+              </div>
+              <div class="pq-step">
+                <div class="pq-step-label">第 3 步<br>列块再切成 Page<small>Page 才执行编码和压缩</small></div>
+                <div class="pq-step-body">
+                  <p>继续放大 <code>RG₂.Volume</code>。小例子只有 2 个值，所以画成 1 个 Data Page；真实的大 Column Chunk 通常会包含多个 Page。</p>
+                  <div class="pq-page"><b>RG₂.Volume<br>Data Page 1</b><code>整数值 [500, 900] → encoding 编码 → ZSTD / Snappy / LZ4_RAW 压缩 → 写入磁盘字节</code></div>
+                </div>
+              </div>
+              <div class="pq-step">
+                <div class="pq-step-label">第 4 步<br>文件末尾写 Footer<small>像整份文件的目录</small></div>
+                <div class="pq-step-body">
+                  <p>Footer 不重复保存这 4 行实际数据。它主要告诉读取器“有哪些列、每块在哪里、每个行组的统计范围是什么”。</p>
+                  <div class="pq-footer">
+                    <span><b>Schema</b>Price: int32<br>Volume: int32</span>
+                    <span><b>RG₁.Volume 统计</b>min=100 · max=200<br>以及块的 offset / size</span>
+                    <span><b>RG₂.Volume 统计</b>min=500 · max=900<br>以及块的 offset / size</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pq-definition">
+              <div><b>Row Group（行组）</b>文件中的一批完整行。</div>
+              <div><b>Column Chunk（列块）</b>一个行组里，某一列的全部值。</div>
+              <div><b>Page（页）</b>列块内部用于编码、压缩和读取的小单位。</div>
+              <div><b>Footer（文件尾元数据）</b>记录 Schema、块位置和统计信息的目录。</div>
+            </div>
+            <div class="pq-query-path" aria-label="查询 Volume 大于等于 500 并返回 Price 时的读取路径">
+              <span>① 先读 Footer</span><i>→</i><span class="skip">② RG₁.max=200<br>整组跳过</span><i>→</i><span class="read">③ 读 RG₂.Volume<br>[500, 900]</span><i>→</i><span class="read">④ 再取 RG₂.Price<br>[1179, 1182]</span>
+            </div>
+          </div>
+        </div>
+        <h3>对同一个查询，两种布局需要读什么</h3>
+        <div class="formula-line">Q = π<sub>Price</sub>( σ<sub>Volume ≥ 500</sub>(R) )<br>白话：找出 Volume 至少为 500 的记录，最终只返回 Price。</div>
+        <table class="mini-table"><thead><tr><th>格式</th><th>读取过程</th><th>简化的 I/O 表达</th></tr></thead><tbody>
+          <tr><td>CSV</td><td>为了找到 <code>Volume</code>，通常要顺序读取每行，根据逗号拆字段，再将文本解析成整数。</td><td><code>I/O<sub>CSV</sub> ≈ |file|</code></td></tr>
+          <tr><td>Parquet</td><td>先读 Footer。RG₁ 的 <code>max(Volume)=200</code>，不可能命中，整个行组跳过；然后只打开 RG₂ 的 <code>Volume Column Chunk</code> 做过滤，并读取同一行组的 <code>Price Column Chunk</code> 返回结果。</td><td><code>I/O<sub>Parquet</sub> ≈ |footer| + |RG₂.Volume| + |RG₂.Price|</code></td></tr>
+        </tbody></table>
+        <div class="why-box"><b>严谨说明：</b>上图是物理布局的简化模型，不是 Parquet 的逐字节文件十六进制图。真实文件还包含页头、编码信息、压缩后的数据和 Footer；但“CSV 的行文本流”与“Parquet 的行组内列块”这个核心区别是准确的。</div>
+      </div>
+      <div class="knowledge-slide" aria-label="CSV 与 Parquet 数据表示对比">
+        <div class="knowledge-title"><b>知识讲解：从逻辑表到磁盘字节</b><span>serialization → encoding → compression</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. 序列化</b><p>将内存中带有类型的列与记录，转换成可写入文件的字节序列。CSV 主要保存文本，读取时需重新推断类型。</p></div>
+            <div class="concept-item"><b>2. 列式存储</b><p>Parquet 将同一列的值相邻存放。相同类型且分布相似的值更容易编码和压缩，查询也可只读所需列。</p></div>
+            <div class="concept-item"><b>3. 压缩编解码器</b><p>ZSTD、Snappy 和 LZ4_RAW 都是 Parquet 页可以使用的压缩编解码器。它们不是 Parquet 独有的算法，而是被 Parquet 调用来压缩已编码字节。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">同一逻辑表的两种物理组织</div>
+            <div class="diagram-flow">
+              <div class="diagram-node">
+                <strong>CSV · 按行文本</strong>
+                <div class="file-lines"><span>92500810,1178,100,2</span><span>93000120,1180,500,0</span><span>93001540,1179,200,1</span></div>
+                <small>每行混合时间、价格、成交量和标志；数字以字符保存</small>
+              </div>
+              <div class="diagram-arrow" aria-hidden="true">↔</div>
+              <div class="diagram-node">
+                <strong>Parquet · 按列分块</strong>
+                <div class="column-blocks"><div>Time<i></i><i></i></div><div>Price<i></i><i></i></div><div>Volume<i></i><i></i></div><div>Flag<i></i><i></i></div></div>
+                <small>每列保留逻辑类型，并可写入 min/max/null 统计</small>
+              </div>
+            </div>
+            <div class="diagram-flow">
+              <div class="diagram-node"><strong>类型化列</strong><small>Int32 / Int8</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>列内编码</strong><small>dictionary / delta / RLE</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>字节压缩</strong><small>ZSTD / Snappy / LZ4</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">关键区分：Parquet 规定数据如何分列、分块并保存元数据；ZSTD 等编解码器负责压缩已编码的字节。</div>
+      </div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：同一份数据写入两种格式</span><button class="copy">复制</button></div><pre><code>from pathlib import Path
+import polars as pl
+
+# 输入和输出保存的是同一张逻辑表，只是物理格式不同。
+csv = Path("data/trades.csv")
+parquet = Path("data/trades_zstd.parquet")
+
+# CSV 没有可靠的列类型元数据，因此读取时明确指定整数宽度。
+df = pl.read_csv(csv, schema_overrides={
+    "Price": pl.Int32,
+    "Volume": pl.Int32,
+    "BSFlag": pl.Int8,
+})
+# statistics=True 会写入行组统计，查询引擎可据此跳过部分数据。
+df.write_parquet(parquet, compression="zstd", statistics=True)
+
+# 先比较磁盘大小，再查看 Parquet 中保留下来的列类型。
+print("CSV:    ", round(csv.stat().st_size / 1024, 1), "KiB")
+print("Parquet:", round(parquet.stat().st_size / 1024, 1), "KiB")
+print(df.schema)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>CSV:     398.3 KiB
+Parquet: 8.4 KiB
+Schema({'Time': Int64, 'Price': Int32, 'Volume': Int32,
+        'BSFlag': Int8, 'date': Int64, 'symbol': String})</pre><p class="run-note">这份 12,000 行自编数据中，Parquet 约为 CSV 的 2.1%，并保留整数与字符串类型。</p></div>
+      <div class="observe"><b>预期观察：</b>Parquet 通常更小，而且保留 <code>Int32</code>/<code>Int8</code> 类型。数字不必反复变成字符串再解析回数字。</div>
+      <div class="knowledge-slide" aria-label="Parquet 从列数据编码到 ZSTD、Snappy 或 LZ4 RAW 压缩的流程">
+        <div class="knowledge-title"><b>可视化例子：压缩算法在 Parquet 的哪一层</b><span>typed values → encoding → page compression</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. 先分列并分页</b><p>例如 <code>Volume=[100,200,500,900]</code> 先进入 Volume 列的 Data Page，不会和 Price 列交错保存。</p></div>
+            <div class="concept-item"><b>2. 先编码，后压缩</b><p>Dictionary、RLE 或 Delta 编码先利用列值的结构；随后再对页的已编码数据块使用一种 codec。</p></div>
+            <div class="concept-item"><b>3. 每个列块选一种 codec</b><p>写入器可选 ZSTD、Snappy、LZ4_RAW 或不压缩等方式，并在元数据中记录选择，供读取器解压。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">一个 Volume Data Page 的处理链</div>
+            <div class="diagram-flow">
+              <div class="diagram-node"><strong>类型化列值</strong><small>[100, 200, 500, 900]<br>Int32</small></div>
+              <div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>列内编码</strong><small>PLAIN / RLE / DELTA<br>产生已编码字节</small></div>
+              <div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>页数据压缩</strong><small>ZSTD <b>或</b> Snappy <b>或</b> LZ4_RAW</small></div>
+              <div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>Parquet 中的 Page</strong><small>PageHeader 记录压缩前后大小；ColumnMetaData 记录 codec</small></div>
+            </div>
+            <div class="visual-label">本讲义数据的实测 Parquet 文件大小（KiB，越短越小）</div>
+            <div class="metric-line"><span>ZSTD · 8.3</span><div class="meter"><i style="width:51.9%"></i></div></div>
+            <div class="metric-line"><span>LZ4_RAW · 14.7</span><div class="meter"><i style="width:91.9%"></i></div></div>
+            <div class="metric-line"><span>Snappy · 16.0</span><div class="meter"><i style="width:100%"></i></div></div>
+            <div class="diagram-flow">
+              <div class="diagram-node"><strong>ZSTD</strong><small>通常更省空间；可调压缩等级</small></div>
+              <div class="diagram-node"><strong>Snappy</strong><small>以快速解压和广泛兼容为主</small></div>
+              <div class="diagram-node"><strong>LZ4_RAW</strong><small>以快速压缩/解压为主</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">这三种算法不负责“按列存储”；列式布局由 Parquet 规定，codec 只压缩页中已编码的数据块。图中大小来自本机实际运行，不是对所有数据集的固定排名。</div>
+      </div>
+      <div class="question"><b>问题解释：</b>ZSTD 往往能得到更小的文件，但压缩级别越高，写入时消耗的 CPU 时间通常越多。Snappy 与 LZ4_RAW 更强调快速编解码。需要注意，Parquet 规范中旧的 <code>LZ4</code> codec 已废弃；现在应使用可互操作的 <code>LZ4_RAW</code>，Polars API 中的 <code>compression="lz4"</code> 对应这一现代实现。选择时要同时比较磁盘空间、写入时间、读取时间和目标引擎的支持情况。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：比较 CSV、CSV.gz 与三种 Parquet 压缩编解码器</span><button class="copy">复制</button></div><pre><code>from pathlib import Path
+from time import perf_counter
+import gzip
+import io
+import polars as pl
+
+source = Path("data/trades.csv")
+df = pl.read_csv(source)
+out = Path("data/format-benchmark")
+out.mkdir(parents=True, exist_ok=True)
+
+# 统一计时函数：既返回函数结果，也返回实际经过的秒数。
+def timed(callable_):
+    start = perf_counter()
+    value = callable_()
+    return value, perf_counter() - start
+
+# CSV.gz 仍然是文本 CSV，只是在文件外层增加 gzip 压缩。
+def write_gzip(path):
+    with gzip.open(path, "wb", compresslevel=6) as stream:
+        stream.write(df.write_csv().encode("utf-8"))
+
+# 五种输出使用不同文件名，防止互相覆盖。
+files = {
+    "CSV": out / "trades.csv",
+    "CSV.gz": out / "trades.csv.gz",
+    "Parquet-ZSTD": out / "trades_zstd.parquet",
+    "Parquet-Snappy": out / "trades_snappy.parquet",
+    "Parquet-LZ4_RAW": out / "trades_lz4.parquet",
+}
+
+# 每种格式分别定义写入和读取动作，便于使用同一套计时逻辑。
+writers = {
+    "CSV": lambda: df.write_csv(files["CSV"]),
+    "CSV.gz": lambda: write_gzip(files["CSV.gz"]),
+    "Parquet-ZSTD": lambda: df.write_parquet(files["Parquet-ZSTD"], compression="zstd"),
+    "Parquet-Snappy": lambda: df.write_parquet(files["Parquet-Snappy"], compression="snappy"),
+    # Polars 参数名为 "lz4"，写入的是 Parquet 支持的 LZ4_RAW codec。
+    "Parquet-LZ4_RAW": lambda: df.write_parquet(files["Parquet-LZ4_RAW"], compression="lz4"),
+}
+readers = {
+    "CSV": lambda: pl.read_csv(files["CSV"]),
+    "CSV.gz": lambda: pl.read_csv(io.BytesIO(gzip.decompress(files["CSV.gz"].read_bytes()))),
+    "Parquet-ZSTD": lambda: pl.read_parquet(files["Parquet-ZSTD"]),
+    "Parquet-Snappy": lambda: pl.read_parquet(files["Parquet-Snappy"]),
+    "Parquet-LZ4_RAW": lambda: pl.read_parquet(files["Parquet-LZ4_RAW"]),
+}
+
+# 每次演示都重新写入、重新读取，并检查读取行数是否一致。
+rows = []
+for name in files:
+    _, write_seconds = timed(writers[name])
+    loaded, read_seconds = timed(readers[name])
+    assert loaded.height == df.height
+    rows.append({
+        "format": name,
+        "size_KiB": round(files[name].stat().st_size / 1024, 1),
+        "write_ms": round(write_seconds * 1000, 2),
+        "read_ms": round(read_seconds * 1000, 2),
+    })
+
+# 按文件大小排序，再讨论“更小”和“更快”是否为同一件事。
+print(pl.DataFrame(rows).sort("size_KiB"))</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>format           size_KiB  write_ms  read_ms
+Parquet-ZSTD          8.3      3.28    15.77
+Parquet-LZ4_RAW      14.7      2.41     0.38
+Parquet-Snappy       16.0      3.09     0.51
+CSV.gz               56.2     11.10     0.86
+CSV                  398.3      4.84     1.08</pre><p class="run-note">这是本机单次实测；首次读取 ZSTD 的 15.77 ms 包含初始化等固定开销。小文件计时波动很大，文件大小更适合稳定对比。</p></div>
+    </section>
+
+    <section class="lesson" id="t2">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 02 · LAYOUT</div><h2>Parquet 数据怎样拆成多个文件</h2><p class="subtitle">同样的 12,000 行数据，换一种文件摆法，查询时需要打开的文件就可能完全不同。</p></div>
+      </div>
+      <div class="goal"><div><b>看完本节应当能回答</b>“数据布局”到底在摆什么；为什么按日期存储适合查某一天；为什么分得越细不一定越快；“分区剪枝”和 Parquet 文件内部的筛选有什么区别。</div></div>
+      <div class="plain-example"><b>先记住一句话：</b>Parquet 规定“一个文件内部怎样存”；数据布局决定“一整张表拆成几个文件，以及每个文件装哪些行”。本节只改变文件的装法，表中的数值一行也不改。</div>
+      <div class="benefit-block">
+        <h3>合理的数据布局有什么好处</h3>
+        <p class="benefit-lead">布局不会改变答案，它改变的是查询为了得到答案必须接触多少文件和多少数据。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>查询前跳过整批文件</b><p>按日期布局后，查 20260630 可以先排除另外 5 天；不必打开文件后才发现日期不符。</p></div>
+          <div class="benefit-item"><b>独立文件可以并行</b><p>多个日期文件可以分配给不同线程或工作进程读取；单个超大文件往往提供更少的任务拆分机会。</p></div>
+          <div class="benefit-item"><b>便于分批更新和保留</b><p>新增一天可以追加一个日期分区；删除过期日期也可以按目录处理，而不必重写整张历史表。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>分区键必须匹配常见查询。分得过细会产生小文件，固定的打开、元数据和调度成本可能抵消剪枝收益。</p>
+      </div>
+      <div class="foundation">
+        <h3>先把这份自编数据数清楚</h3>
+        <p><code>data/trades.parquet</code> 中有 6 个日期、8 只虚构股票；每个“日期 × 股票”组合有 250 行。因此总行数是：</p>
+        <div class="data-equation" aria-label="6 个日期乘 8 只股票乘每组 250 行等于 12000 行">
+          <span>6 个日期</span><i>×</i><span>8 只股票</span><i>×</i><span>每组 250 行</span><i>=</i><span>12,000 行</span>
+        </div>
+        <p>这 12,000 行可以有许多种装法。下面四种装法的内容完全相同，区别只在于文件的数量和每个文件所覆盖的范围。</p>
+        <div class="layout-cases">
+          <div class="layout-case">
+            <div class="layout-case-head"><b>A · 全部放一起</b><strong>1 个文件</strong></div>
+            <div class="file-strip"><i></i></div>
+            <p>一个文件装 12,000 行，里面混合 6 天和 8 只股票。</p>
+          </div>
+          <div class="layout-case">
+            <div class="layout-case-head"><b>B · 按日期拆</b><strong>6 个文件</strong></div>
+            <div class="file-strip"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <p>每个日期一个文件；每个文件装 8 × 250 = 2,000 行。</p>
+          </div>
+          <div class="layout-case">
+            <div class="layout-case-head"><b>C · 按股票拆</b><strong>8 个文件</strong></div>
+            <div class="file-strip"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <p>每只股票一个文件；每个文件装 6 × 250 = 1,500 行。</p>
+          </div>
+          <div class="layout-case">
+            <div class="layout-case-head"><b>D · 日期 × 股票</b><strong>48 个文件</strong></div>
+            <div class="file-strip dense"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <p>每个日期、每只股票一个文件；共 6 × 8 = 48 个，每个 250 行。图标只画一半，数量以 48 为准。</p>
+          </div>
+        </div>
+        <div class="why-box"><b>“布局”就是上面这项选择。</b>它不等于排序，也不等于压缩。布局回答的是：哪些行被放进同一个文件，以及查询前能否只凭文件路径排除其他文件。</div>
+      </div>
+      <div class="knowledge-slide" aria-label="四种数据布局在两种查询下的候选文件和候选行比较">
+        <div class="knowledge-title"><b>把两种查询真的数一遍</b><span>先排除文件，再读取文件内容</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>查询一：只查 2026-06-30</b><p>按日期拆时，目录名已经告诉我们哪一个文件属于这一天，所以 6 个文件中只需打开 1 个。按股票拆时，8 个股票文件里都可能有这一天，只凭目录一个也排除不了。</p></div>
+            <div class="concept-item"><b>查询二：只查股票 S002</b><p>逻辑正好相反：按股票拆只需打开 1 个文件；按日期拆则 6 个日期文件都可能含有 S002。</p></div>
+            <div class="concept-item"><b>表格中的“候选行”</b><p>它表示文件级筛选之后，最多还有多少行位于候选文件中，不代表引擎一定会逐行读取。打开 Parquet 后，行组统计等信息还可能继续排除数据。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">候选文件数 / 总文件数 · 候选文件内的总行数</div>
+            <table class="mini-table query-matrix">
+              <thead><tr><th>布局</th><th>查一天<br><small>date=20260630</small></th><th>查一只股票<br><small>symbol=S002</small></th></tr></thead>
+              <tbody>
+                <tr><td><b>A 全部一起</b></td><td class="candidate-warn"><strong>1 / 1</strong><small>12,000 行</small></td><td class="candidate-warn"><strong>1 / 1</strong><small>12,000 行</small></td></tr>
+                <tr><td><b>B 按日期</b></td><td class="candidate-good"><strong>1 / 6</strong><small>2,000 行</small></td><td class="candidate-warn"><strong>6 / 6</strong><small>12,000 行</small></td></tr>
+                <tr><td><b>C 按股票</b></td><td class="candidate-warn"><strong>8 / 8</strong><small>12,000 行</small></td><td class="candidate-good"><strong>1 / 8</strong><small>1,500 行</small></td></tr>
+                <tr><td><b>D 日期 × 股票</b></td><td class="candidate-good"><strong>8 / 48</strong><small>2,000 行</small></td><td class="candidate-good"><strong>6 / 48</strong><small>1,500 行</small></td></tr>
+              </tbody>
+            </table>
+            <div class="number-note">例如“1 / 6 · 2,000 行”表示：总共有 6 个文件，目录条件先选出其中 1 个；这个候选文件装有 2,000 行。</div>
+          </div>
+        </div>
+        <div class="slide-caption"><b>现在再给术语命名：</b>把日期或股票值放进目录路径叫“分区”；查询时根据路径跳过不相关文件叫“分区剪枝”。它发生在打开数据文件之前。</div>
+      </div>
+      <div class="foundation">
+        <h3>为什么 D 拆得最细，却不一定最快</h3>
+        <p>查询 2026-06-30 时，B 和 D 的候选数据都是 2,000 行；区别是 B 把它们放在 1 个文件中，D 把它们分散在 8 个文件中。</p>
+        <div class="overhead-compare">
+          <div class="overhead-card"><b>B · 按日期</b><strong>打开 1 次</strong><small>1 个文件 × 2,000 行</small></div>
+          <div class="overhead-vs">对比</div>
+          <div class="overhead-card"><b>D · 日期 × 股票</b><strong>打开 8 次</strong><small>8 个文件 × 每个 250 行</small></div>
+        </div>
+        <p>每次打开文件都要找路径、读取元数据、创建读取任务，远程对象存储还可能产生一次网络请求。为了说明数量级，<b>假设</b>每个文件的固定准备成本为 2 ms，那么这里只计算准备成本就是 2 ms 对 16 ms。这是教学假设，不是本机基准测试；真实数字取决于磁盘、网络、引擎和缓存。</p>
+        <div class="why-box"><b>小文件问题的核心：</b>真正的数据量没有增加，但“开始读取一个文件”这件事重复了太多次。因此分区要足够细，才能跳过无关数据；又不能细到产生海量小文件。</div>
+      </div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：把 1 个总文件拆成 6 个按日文件</span><button class="copy">复制</button></div><pre><code>from pathlib import Path
+import duckdb
+
+# 源文件有 12,000 行；这里不会修改它，而是另写一套按日期摆放的文件。
+# COPY 会执行括号中的查询，并把查询结果写入 data/lake。
+duckdb.sql("""
+COPY (
+    SELECT
+        *,
+        -- date 的形式是 YYYYMMDD，例如 20260630。
+        -- 取出前 4 位和第 5–6 位，用作上层的 year、month 目录。
+        substr(date, 1, 4) AS year,
+        substr(date, 5, 2) AS month
+    FROM read_parquet('data/trades.parquet')
+)
+TO 'data/lake'
+-- PARTITION_BY 告诉 DuckDB：相同 year、month、date 的行放在一起。
+-- OVERWRITE 让这段课堂代码能够重复运行。
+(FORMAT parquet, PARTITION_BY (year, month, date), OVERWRITE);
+""")
+
+# 列出真正的 Parquet 数据文件。
+created = sorted(Path("data/lake").rglob("data_*.parquet"))
+print("生成文件数:", len(created))
+for path in created:
+    print(" -", path)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>生成文件数: 6
+ - data/lake/year=2026/month=06/date=20260625/data_0.parquet
+ - data/lake/year=2026/month=06/date=20260626/data_0.parquet
+ - data/lake/year=2026/month=06/date=20260627/data_0.parquet
+ - data/lake/year=2026/month=06/date=20260628/data_0.parquet
+ - data/lake/year=2026/month=06/date=20260629/data_0.parquet
+ - data/lake/year=2026/month=06/date=20260630/data_0.parquet</pre><p class="run-note">6 个日期各得到 1 个文件。<code>date=20260630</code> 不是 Python 表达式，而是常见的 Hive 风格目录命名：目录名同时记录“分区列是 date、分区值是 20260630”。</p></div>
+      <div class="observe"><b>如何利用这些目录：</b>当查询条件是 <code>date = '20260630'</code> 时，引擎先比较目录名，只保留 <code>date=20260630</code>；另外 5 个日期目录可以在打开 Parquet 之前排除。这一步就是分区剪枝。</div>
+      <div class="question"><b>两种筛选不要混淆：</b>目录中的 <code>date=...</code> 帮助引擎跳过整个文件；进入候选 Parquet 后，文件内部的行组统计、列信息和编码还会继续帮助筛选。前者是本节的数据布局，后者是上一节介绍的 Parquet 内部结构。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：用真实的 12,000 行数据计算四种布局</span><button class="copy">复制</button></div><pre><code>import polars as pl
+
+# 读取本讲义生成的虚构数据。统一把 date 转成字符串，便于和查询条件比较。
+data = pl.read_parquet("data/trades.parquet").with_columns(
+    pl.col("date").cast(pl.String)
+)
+
+# 先从真实数据中统计：每个日期、每只股票、每个“日期×股票”有多少行。
+# 这样下面的 2,000、1,500、250 都不是手填的，而是由数据计算出来的。
+rows_by_date = dict(data.group_by("date").len().iter_rows())
+rows_by_symbol = dict(data.group_by("symbol").len().iter_rows())
+rows_by_pair = {
+    (day, symbol): rows
+    for day, symbol, rows in data.group_by("date", "symbol").len().iter_rows()
+}
+
+dates = sorted(rows_by_date)
+symbols = sorted(rows_by_symbol)
+
+# 一个字典代表一个文件的“目录元数据”。
+# None 表示文件名没有透露这个维度，因此不能靠目录排除它。
+catalogs = {
+    "A 全部放一起": [
+        {"date": None, "symbol": None, "rows": data.height}
+    ],
+    "B 按日期": [
+        {"date": day, "symbol": None, "rows": rows_by_date[day]}
+        for day in dates
+    ],
+    "C 按股票": [
+        {"date": None, "symbol": symbol, "rows": rows_by_symbol[symbol]}
+        for symbol in symbols
+    ],
+    "D 日期×股票": [
+        {"date": day, "symbol": symbol, "rows": rows_by_pair[(day, symbol)]}
+        for day in dates for symbol in symbols
+    ],
+}
+
+queries = {
+    "查一天": {"date": "20260630"},
+    "查一只股票": {"symbol": "S002"},
+}
+
+def candidate_files(files, filters):
+    """只利用文件路径已经知道的值，排除肯定不匹配的文件。"""
+    candidates = []
+    for file_meta in files:
+        can_skip = any(
+            file_meta[column] is not None and file_meta[column] != wanted
+            for column, wanted in filters.items()
+        )
+        if not can_skip:
+            candidates.append(file_meta)
+    return candidates
+
+for query_name, filters in queries.items():
+    condition = ", ".join(f"{key}={value}" for key, value in filters.items())
+    print(f"\n{query_name}: {condition}")
+    for layout_name, files in catalogs.items():
+        candidates = candidate_files(files, filters)
+        candidate_rows = sum(file["rows"] for file in candidates)
+        print(
+            f"  {layout_name:11s} "
+            f"{len(candidates):2d}/{len(files):2d} 个文件，"
+            f"候选行 {candidate_rows:5d}"
+        )</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>查一天: date=20260630
+  A 全部放一起      1/ 1 个文件，候选行 12000
+  B 按日期        1/ 6 个文件，候选行  2000
+  C 按股票        8/ 8 个文件，候选行 12000
+  D 日期×股票      8/48 个文件，候选行  2000
+
+查一只股票: symbol=S002
+  A 全部放一起      1/ 1 个文件，候选行 12000
+  B 按日期        6/ 6 个文件，候选行 12000
+  C 按股票        1/ 8 个文件，候选行  1500
+  D 日期×股票      6/48 个文件，候选行  1500</pre><p class="run-note">这些数字由 <code>data/trades.parquet</code> 实际统计得到。候选行是文件级剪枝后的上限；Parquet 文件内部仍可能继续剪枝。</p></div>
+      <div class="foundation">
+        <h3>逐行读一次运行结果</h3>
+        <table class="mini-table"><thead><tr><th>结果</th><th>翻译成白话</th><th>结论</th></tr></thead><tbody>
+          <tr><td><code>按日期 1/6 · 2,000</code></td><td>查一天时，6 个日期文件只留下 1 个；其中正好是当天 8 只股票的 2,000 行。</td><td>按日期很适合“某日全市场”。</td></tr>
+          <tr><td><code>按股票 8/8 · 12,000</code></td><td>查一天时，8 个股票文件都可能包含这一天。目录无法排除任何文件。</td><td>股票目录不能帮助日期条件。</td></tr>
+          <tr><td><code>按股票 1/8 · 1,500</code></td><td>查 S002 时，目录名直接排除另外 7 只股票，只留下 S002 在 6 天中的 1,500 行。</td><td>按股票适合单标的长时间序列。</td></tr>
+          <tr><td><code>日期×股票 8/48 · 2,000</code></td><td>查一天时需要当天 8 只股票的 8 个小文件；行数与按日期相同，文件打开次数却是 8 倍。</td><td>剪枝更细不代表固定开销更小。</td></tr>
+        </tbody></table>
+        <p><b>选择方法：</b>先统计最常见的查询条件，再用它决定分区。课程中的查询如果大多是“每天处理全市场”，优先按日期；如果大多是“读取某只股票多年历史”，按股票可能更合适。数据量、单文件大小和存储系统不同，现实中不存在永远正确的唯一方案。</p>
+      </div>
+      <div class="knowledge-slide" aria-label="Parquet 之外的现代存储技术分层与 GitHub 公开数据">
+        <div class="knowledge-title"><b>扩展：Parquet 之外，近年还流行什么</b><span>table format · physical format · array storage</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>先看最重要的区别</b><p>Iceberg、Delta Lake 和 Hudi 通常不是把 Parquet 文件换掉，而是在文件之上增加事务日志、快照、表结构和文件清单。数据本体往往仍然保存在 Parquet 中。</p></div>
+            <div class="concept-item"><b>Iceberg / Delta Lake / Hudi</b><p>三者属于表格式或表管理层。Iceberg 强调开放表元数据与模式、分区演化；Delta Lake 强调事务日志、ACID 与湖仓一体；Hudi 擅长持续写入、更新和增量查询。</p></div>
+            <div class="concept-item"><b>Lance / Vortex</b><p>它们更接近 Parquet 的物理格式替代者。Lance 面向向量、图像等 AI / 多模态数据的随机访问；Vortex 面向可扩展编码和“尽量直接在压缩数据上计算”，但生态仍较年轻。</p></div>
+            <div class="concept-item"><b>Zarr</b><p>Zarr 把 N 维数组切成 Chunk，适合影像、气象、因子立方体等数组切片。它解决的数据模型与表格不同，详见主题 7。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">它们在存储系统中的位置</div>
+            <div class="storage-stack">
+              <div class="storage-layer">
+                <b>表管理层：在许多文件之上提供“数据库表”的能力</b>
+                <div class="storage-techs">
+                  <div class="storage-tech">Apache Iceberg</div>
+                  <div class="storage-tech">Delta Lake</div>
+                  <div class="storage-tech">Apache Hudi</div>
+                </div>
+                <small>保存快照、事务、Schema、分区规则和文件清单；底层文件通常仍是 Parquet。</small>
+              </div>
+              <div class="storage-down">↓</div>
+              <div class="storage-layer">
+                <b>物理数据格式：决定数据在文件或对象中怎样排列</b>
+                <div class="storage-techs">
+                  <div class="storage-tech current">Parquet · 表格列存</div>
+                  <div class="storage-tech">Lance · AI 随机访问</div>
+                  <div class="storage-tech">Vortex · 压缩计算</div>
+                </div>
+                <small>Zarr 是另一条分支：<span class="storage-tech array" style="display:inline-block;padding:2px 7px">N 维数组 Chunk</span></small>
+              </div>
+              <div class="storage-down">↓</div>
+              <div class="storage-layer"><b>实际介质</b><div class="storage-techs"><div class="storage-tech">本地 SSD</div><div class="storage-tech">对象存储</div><div class="storage-tech">分布式文件系统</div></div></div>
+            </div>
+            <div class="visual-label">公开关注度快照 · GitHub Stars（2026-07-13）</div>
+            <div class="popularity-list" aria-label="各开源项目 GitHub 星标数与复刻数">
+              <div class="popularity-row"><b>Iceberg<small>仓库始于 2018</small></b><div class="popularity-track"><i style="width:100%"></i></div><span class="popularity-number">9,041 ★ · 3,399 forks</span></div>
+              <div class="popularity-row"><b>Delta<small>仓库始于 2019</small></b><div class="popularity-track"><i style="width:98.5%"></i></div><span class="popularity-number">8,901 ★ · 2,135 forks</span></div>
+              <div class="popularity-row"><b>Lance<small>仓库始于 2022</small></b><div class="popularity-track"><i style="width:75%"></i></div><span class="popularity-number">6,782 ★ · 752 forks</span></div>
+              <div class="popularity-row"><b>Hudi<small>仓库始于 2016</small></b><div class="popularity-track"><i style="width:68.4%"></i></div><span class="popularity-number">6,186 ★ · 2,496 forks</span></div>
+              <div class="popularity-row"><b>Vortex<small>仓库始于 2024</small></b><div class="popularity-track"><i style="width:34.1%"></i></div><span class="popularity-number">3,087 ★ · 184 forks</span></div>
+              <div class="popularity-row"><b>Zarr.py<small>仓库始于 2015</small></b><div class="popularity-track"><i style="width:22.3%"></i></div><span class="popularity-number">2,013 ★ · 427 forks</span></div>
+            </div>
+            <div class="number-note">Stars、forks 和仓库创建年份来自各项目 GitHub 仓库，是可复查的社区关注度指标；仓库年份不一定等于项目构思年份，星标也不等于企业部署量、市场份额或性能。柱长以本组最高的 Iceberg 为 100% 归一化。</div>
+          </div>
+        </div>
+        <div class="slide-caption">选择示例：已有大量 Parquet、需要可靠更新和时间旅行，可考察 Iceberg / Delta / Hudi；大量向量和多模态随机读取可考察 Lance；N 维数组切片用 Zarr；Vortex 值得关注，但属于更早期的新格式。对简单的本地表格分析，Parquet 仍然是成熟而直接的默认选择。</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="t3">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 03 · POLARS</div><h2>Polars Lazy API：从查询计划到执行</h2><p class="subtitle">懒执行先构建完整查询图，再由优化器调整过滤、列选择和聚合的执行位置。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>能说明 <code>scan_*</code> 与 <code>read_*</code> 的执行时机差异；能使用 <code>explain()</code> 检查过滤和列选择是否被移到扫描阶段。</div></div>
+      <div class="plain-example"><b>直观例子：</b>要从仓库取“成交量大于 100 的股票代码、价格和成交量”时，Eager 做法像先把整座仓库搬进房间再挑选；Lazy 做法先看完整清单，只从仓库取需要的三列和符合条件的记录。</div>
+      <div class="benefit-block">
+        <h3>Polars Lazy 有什么好处</h3>
+        <p class="benefit-lead">Lazy 模式先收集完整计算计划，再决定怎样执行；因此优化器能看到步骤之间的关系。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>过滤尽量靠近数据源</b><p>谓词下推可让不符合条件的行尽早消失，减少后续分组、连接和排序的工作量。</p></div>
+          <div class="benefit-item"><b>只读取最终需要的列</b><p>投影下推可以把选列移入扫描阶段，减少 Parquet 读取量和中间 DataFrame 的内存占用。</p></div>
+          <div class="benefit-item"><b>整条流水线一起优化</b><p>优化器可以合并表达式、安排并行执行并避免部分无用中间结果，而不是逐行解释 Python 循环。</p></div>
+          <div class="benefit-item"><b>计划可以检查</b><p><code>explain()</code> 会显示过滤和选列落在什么位置，使“是否真的下推”成为可核对的事实。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>真正的错误可能到 <code>collect()</code> 才出现，调试比逐步执行更间接；很小的内存表不一定能看到明显性能差距。</p>
+      </div>
+      <div class="foundation">
+        <h3>Polars 本身是什么</h3>
+        <p><b>Polars 是一个用于读取、整理、转换和分析表格数据的 DataFrame 库。</b>它的 Python API 用法与 Pandas 有相似之处，但核心主要由 Rust 实现，并将列式表达式、多线程执行和查询优化作为重要设计。</p>
+        <div class="term-grid">
+          <div class="term-card"><b>DataFrame 是什么</b><p>它是内存中的二维表：有列名、行和每列的数据类型。可以过滤、选列、分组、聚合和连接。</p></div>
+          <div class="term-card"><b>Polars 不是文件格式</b><p><code>.parquet</code> 是磁盘上的文件；Polars 是打开文件并执行计算的程序库。它也能读 CSV、JSON 等格式。</p></div>
+          <div class="term-card"><b>Expression 表达式</b><p><code>pl.col("Volume") &gt;= 100</code> 不是一个单独数值，而是对整列要执行什么操作的可组合描述。</p></div>
+          <div class="term-card"><b>Eager 与 Lazy 两套入口</b><p><code>read_*</code> 直接得到 DataFrame；<code>scan_*</code> 先得到 LazyFrame 查询计划，到 <code>collect()</code> 才运行。</p></div>
+        </div>
+        <table class="mini-table"><thead><tr><th>名称</th><th>它在本讲义中的角色</th><th>它不是什么</th></tr></thead><tbody>
+          <tr><td>Parquet</td><td>保存表格数据的列式文件格式</td><td>不是计算引擎</td></tr>
+          <tr><td>Polars</td><td>用 Python API 组织 DataFrame 处理管道</td><td>不是文件或数据库服务</td></tr>
+          <tr><td>DuckDB</td><td>用 SQL 查询 Parquet 和其他表格数据</td><td>不要求把本地 Parquet 先导入服务器</td></tr>
+        </tbody></table>
+      </div>
+      <div class="foundation">
+        <h3>Lazy 不是“慢慢运行”，而是“先不运行”</h3>
+        <p><code>read_parquet()</code> 的意思是“现在把数据读成 DataFrame”；<code>scan_parquet()</code> 的意思是“先记下数据在哪里，稍后再决定怎么读”。Lazy 在这里指“延迟执行”，不是性能慢。</p>
+        <table class="mini-table"><thead><tr><th>代码</th><th>当下发生什么</th><th>数据是否已读入</th></tr></thead><tbody>
+          <tr><td><code>pl.scan_parquet(path)</code></td><td>创建“从 Parquet 读数据”的计划节点。</td><td>没有</td></tr>
+          <tr><td><code>.filter(...)</code></td><td>在计划上加一个过滤节点。</td><td>没有</td></tr>
+          <tr><td><code>.group_by(...).agg(...)</code></td><td>记下分组和聚合的要求。</td><td>没有</td></tr>
+          <tr><td><code>.explain()</code></td><td>让你看优化后准备怎么做。</td><td>通常不执行业务查询</td></tr>
+          <tr><td><code>.collect()</code></td><td>优化完整计划，真正读取、过滤、聚合并返回 DataFrame。</td><td>是</td></tr>
+        </tbody></table>
+        <div class="term-grid">
+          <div class="term-card"><b>谓词下推（Predicate Pushdown）</b><p>把 <code>Volume &gt;= 100</code> 尽量移到读文件时执行。越早丢掉无关行，后面聚合的数据越少。</p></div>
+          <div class="term-card"><b>投影下推（Projection Pushdown）</b><p>“投影”在数据库里指选列。查询只用 <code>symbol</code>、<code>Price</code>、<code>Volume</code>，就不读其他列。</p></div>
+        </div>
+        <div class="why-box"><b>怎么知道优化真的发生了？</b> 不要只看耗时。本页真实计划中的 <code>PROJECT 3/5 COLUMNS</code> 证明只读 5 列中的 3 列；<code>SELECTION: Volume &gt;= 100</code> 证明过滤已靠近扫描节点。</div>
+      </div>
+      <div class="knowledge-slide" aria-label="Polars 急切执行与懒执行计划对比">
+        <div class="knowledge-title"><b>知识讲解：为什么“先看到全部计划”才能优化</b><span>eager vs lazy · predicate pushdown · projection pushdown</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. Eager（急切执行）</b><p>每步 API 调用立即生成结果。如果第一步已把全部列和全部行读入内存，后面的过滤无法挽回已发生的 I/O 与解析成本。</p></div>
+            <div class="concept-item"><b>2. Lazy（懒执行）</b><p><code>scan_parquet()</code> 返回 LazyFrame。之后的过滤、聚合和排序先形成逻辑计划，直到 <code>collect()</code> 才优化并执行。</p></div>
+            <div class="concept-item"><b>3. 下推优化</b><p>谓词下推将 <code>filter</code> 移近数据源；投影下推只读取后续真正使用的列。两者都以“减少早期数据量”为目标。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">同一个查询的两条执行路径</div>
+            <div class="plan-compare">
+              <div class="plan-lane">
+                <h4>Eager 路径</h4>
+                <div class="plan-step costly">读入全部列与全部行</div>
+                <div class="plan-step costly">在内存中物化 DataFrame</div>
+                <div class="plan-step">filter Volume ≥ 100</div>
+                <div class="plan-step">select 3 列 + group_by</div>
+              </div>
+              <div class="plan-lane">
+                <h4>Lazy 优化路径</h4>
+                <div class="plan-step good">查询图确认只需 3 列</div>
+                <div class="plan-step good">扫描阶段应用 Volume 过滤</div>
+                <div class="plan-step good">将较少的行交给 group_by</div>
+                <div class="plan-step">collect 返回最终结果</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption"><code>explain()</code> 的用途不是预测精确耗时，而是确认优化器是否减少了扫描列、输入行和中间物化。</div>
+      </div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：打印优化计划后再执行</span><button class="copy">复制</button></div><pre><code>import polars as pl
+
+# scan_parquet 只登记数据源；下面的操作先组合成查询计划。
+query = (
+    # 指定 data_*.parquet，避免 macOS 外置盘的 ._ 辅助文件被当成数据。
+    pl.scan_parquet("data/lake/**/data_*.parquet")
+    # 过滤条件会尽量下推到扫描阶段，减少后续处理行数。
+    .filter(pl.col("Volume") &gt;= 100)
+    .group_by("symbol")
+    .agg(
+        pl.len().alias("trades"),
+        pl.col("Volume").sum().alias("volume"),
+        (pl.col("Price") * pl.col("Volume") / 100)
+            .sum().alias("amount_yuan"),
+    )
+    # 先按成交额降序排序，再只保留前 10 名。
+    .sort("amount_yuan", descending=True)
+    .head(10)
+)
+
+print(query.explain())  # 先看优化后的计划
+result = query.collect() # 到这里才执行
+print(result)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · 页面显示关键部分</span></div><pre>Parquet SCAN [.../data_0.parquet]
+PROJECT 3/5 COLUMNS
+SELECTION: [(col("Volume")) &gt;= (100)]
+ESTIMATED ROWS: 12000
+
+symbol  trades  volume  amount_yuan
+S008      1500  671400  7.938921e6
+S007      1500  671400  7.771071e6
+S006      1500  671400  7.603221e6
+……共返回 8 行</pre><p class="run-note">计划明确显示 6 个 Parquet 文件共 12,000 行，只扫描 5 个数据列中的 3 个，并在扫描阶段应用 Volume 过滤。</p></div>
+      <div class="observe"><b>预期观察：</b><code>filter</code> 和需要的列会尽可能被推到扫描阶段。这比“先把全部文件读进内存，再丢掉大部分数据”更合理。</div>
+      <div class="question"><b>问题解释：</b>投影下推让 Parquet 扫描器只读取查询所需列，因此可减少列页读取、解压和解码工作，也避免把无关列放入内存。谓词下推进一步减少进入聚合与排序的行数；若过滤条件能利用分区值或 Parquet 行组统计，还可能连对应数据块都不读取。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：用同一查询比较 Eager 与 Lazy 执行</span><button class="copy">复制</button></div><pre><code>from time import perf_counter
+import polars as pl
+
+# 收紧文件名模式，不读取 macOS 可能生成的 ._ 辅助文件。
+path = "data/lake/**/data_*.parquet"
+
+# 这段业务逻辑既能接收 DataFrame，也能接收 LazyFrame。
+# 因而两条路径的过滤、聚合和排序完全一致，比较才公平。
+def summarize(frame):
+    return (
+        frame
+        .filter(pl.col("Volume") &gt;= 100)
+        .group_by("symbol")
+        .agg(
+            pl.col("Volume").sum().alias("volume"),
+            (pl.col("Price") * pl.col("Volume") / 100)
+                .sum().alias("amount_yuan"),
+        )
+        .sort("amount_yuan", descending=True)
+        .head(10)
+    )
+
+start = perf_counter()
+eager_source = pl.read_parquet(path)       # 先物化全部可读列和行
+eager_result = summarize(eager_source)
+eager_seconds = perf_counter() - start
+
+# Lazy 路径先得到计划；此时还没有真正读取全部数据。
+lazy_query = summarize(pl.scan_parquet(path))
+print("优化后的 Lazy 计划：")
+print(lazy_query.explain(optimized=True))
+
+start = perf_counter()
+lazy_result = lazy_query.collect()         # 优化后再读取和执行
+lazy_seconds = perf_counter() - start
+
+# 耗时受缓存和机器状态影响，课堂上关注执行计划与数量级。
+print("Eager:", round(eager_seconds, 4), "s")
+print("Lazy: ", round(lazy_seconds, 4), "s")
+print(lazy_result)
+# 性能优化不能改变业务结果，因此最后必须做一致性校验。
+assert eager_result.equals(lazy_result)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · 页面显示摘要</span></div><pre>Eager: 0.0082 s
+Lazy:  0.0016 s
+
+symbol  volume  amount_yuan
+S008    671400  7.938921e6
+S007    671400  7.771071e6
+S006    671400  7.603221e6
+……共返回 8 行，一致性断言通过</pre><p class="run-note">本次 Lazy 约为 Eager 的 1/5 耗时；小数据计时波动明显，应重点观察计划中的列选择和过滤下推。</p></div>
+    </section>
+
+    <section class="lesson" id="t4">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 04 · DUCKDB</div><h2>DuckDB：直接查询 Parquet 文件集</h2><p class="subtitle">DuckDB 是嵌入式分析型数据库。它可以将 Parquet 文件集作为表扫描，并执行列剪枝、过滤下推、聚合和 Top-K。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>能对 Parquet 文件集执行 SQL，并使用 <code>EXPLAIN ANALYZE</code> 阅读实际执行算子、处理行数和运行时间。</div></div>
+      <div class="plain-example"><b>直观例子：</b>SQL 只描述“我要什么”，例如“成交额最高的 10 只股票”；DuckDB 再把它拆成扫描文件、过滤日期、按股票聚合、排序和取前 10 名。<code>EXPLAIN ANALYZE</code> 就是这条流水线的实际运行记录。</div>
+      <div class="benefit-block">
+        <h3>DuckDB 有什么好处</h3>
+        <p class="benefit-lead">DuckDB 是嵌入进程序的分析型数据库：不需要先部署数据库服务器，就能直接对本地文件执行 SQL。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>直接查询 Parquet</b><p>无需先把整份文件导入另一套数据库；SQL 中可以直接扫描一个文件或一组分区文件。</p></div>
+          <div class="benefit-item"><b>复杂分析用 SQL 表达</b><p>分组、连接、窗口函数、排序和 Top N 可以组合在一条声明式查询中，适合检查业务口径。</p></div>
+          <div class="benefit-item"><b>面向分析的向量化执行</b><p>引擎按数据块处理列，并使用过滤、列选择、Top N 等优化，避免 Python 层逐行循环。</p></div>
+          <div class="benefit-item"><b>执行过程可以解释</b><p><code>EXPLAIN ANALYZE</code> 给出算子、行数和实际执行信息，方便定位扫描过多或排序过早等问题。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>它主要面向本地和分析型工作负载，不等同于面向大量并发事务、长期在线服务的服务器数据库。</p>
+      </div>
+      <div class="foundation">
+        <h3>DuckDB 到底是什么</h3>
+        <p>DuckDB 是一个“装在应用程序里的分析型数据库引擎”。运行 <code>import duckdb</code> 后，Python 进程就能执行 SQL。这里不需要启动 MySQL/PostgreSQL 服务，也不需要先把 Parquet 导入一张数据库表。</p>
+        <div class="term-grid">
+          <div class="term-card"><b>Polars 的角度</b><p>用 Python 表达式组合数据管道，适合与 Python 逻辑紧密结合、持续生成 DataFrame 的处理。</p></div>
+          <div class="term-card"><b>DuckDB 的角度</b><p>用 SQL 描述过滤、连接、分组和排序，适合临时分析、熟悉 SQL 的人员和多表查询。</p></div>
+        </div>
+        <h3>把这条 SQL 逐句翻译</h3>
+        <table class="mini-table"><thead><tr><th>SQL 片段</th><th>白话意思</th></tr></thead><tbody>
+          <tr><td><code>FROM read_parquet(...)</code></td><td>把匹配的 Parquet 文件当成一张表；不是先整体导入。</td></tr>
+          <tr><td><code>WHERE date = '20260630'</code></td><td>只保留 2026-06-30 的行；如果 date 来自分区目录，还可以先剪掉其他目录。</td></tr>
+          <tr><td><code>GROUP BY symbol</code></td><td>把同一只股票的所有成交放在一组。</td></tr>
+          <tr><td><code>count / sum</code></td><td>对每组计算笔数、成交量和成交额。</td></tr>
+          <tr><td><code>ORDER BY ... DESC LIMIT 10</code></td><td>按成交额从大到小排序，只返回前 10 名。</td></tr>
+        </tbody></table>
+        <div class="walkthrough">
+          <div class="walk-step"><b>读执行计划要从下往上。</b>最下面的 <code>TABLE_SCAN</code> 是数据入口，上面依次是投影、分组和 Top-N。</div>
+          <div class="walk-step"><b>先检查读了什么。</b>真实计划显示 <code>Total Files Read: 1</code>，投影列是 <code>symbol, Volume, Price</code>。</div>
+          <div class="walk-step"><b>再检查行数怎样变化。</b>日期剪枝后有 2,000 行进入聚合，按 8 只虚构股票得到 8 组；<code>LIMIT 10</code> 因总共只有 8 组而返回 8 行。</div>
+        </div>
+      </div>
+      <div class="knowledge-slide" aria-label="DuckDB 从 SQL 到 Parquet 执行计划">
+        <div class="knowledge-title"><b>知识讲解：一条 SQL 如何变成一组执行算子</b><span>logical plan → physical operators → runtime profile</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. 嵌入式分析引擎</b><p>DuckDB 与 Python 进程在同一台机器内运行，可直接扫描本地 Parquet，不需先将数据导入独立数据库服务。</p></div>
+            <div class="concept-item"><b>2. 逻辑计划与物理计划</b><p>SQL 先被理解为选列、过滤、分组和排序等逻辑要求；优化器再选择 Parquet Scan、Hash Group By 和 Top N 等实际执行算子。</p></div>
+            <div class="concept-item"><b>3. EXPLAIN ANALYZE</b><p><code>EXPLAIN</code> 显示计划；<code>EXPLAIN ANALYZE</code> 会真正执行查询，并将处理行数和耗时附加到每个算子。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">示例查询的物理执行树（数据由下向上流动）</div>
+            <div class="operator-tree">
+              <div class="operator"><strong>TOP_N</strong><br>ORDER BY amount DESC · LIMIT 10</div>
+              <div class="operator"><strong>HASH_GROUP_BY</strong><br>GROUP BY symbol · SUM / COUNT</div>
+              <div class="operator"><strong>FILTER</strong><br>date = '20260630'</div>
+              <div class="operator"><strong>PARQUET_SCAN</strong><br>列剪枝 · 分区剪枝 · 行组统计</div>
+            </div>
+            <div class="diagram-flow">
+              <div class="diagram-node"><strong>SQL 文本</strong><small>声明“要什么”</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>优化器</strong><small>决定“怎么做”</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>运行时剖析</strong><small>验证“实际做了什么”</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">阅读计划时先查数据源扫描了哪些文件和列，再看过滤后的行数是否在进入聚合前明显减少，最后定位耗时最高的算子。</div>
+      </div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：执行 SQL 并分析查询计划</span><button class="copy">复制</button></div><pre><code>import duckdb
+
+# SQL 单独保存为字符串，既可以执行，也可以拼到 EXPLAIN ANALYZE 后面。
+sql = """
+SELECT
+    symbol,
+    count(*) AS trades,
+    sum(Volume) AS volume,
+    sum(Price * Volume) / 100 AS amount_yuan
+FROM read_parquet(
+    'data/lake/**/data_*.parquet',
+    -- 从 year=.../date=... 等目录名恢复分区列。
+    hive_partitioning = true
+)
+WHERE date = '20260630'
+GROUP BY symbol
+ORDER BY amount_yuan DESC
+LIMIT 10
+"""
+
+# 第一行输出 Polars 格式的业务结果，无需额外安装 pandas。
+# 第二行输出每个物理算子的实际运行信息。
+print(duckdb.sql(sql).pl())
+print(duckdb.sql("EXPLAIN ANALYZE " + sql).fetchall()[0][1])</code></pre></div>
+      <details class="run-result"><summary>✓ 实际运行结果 · 展开查看摘要</summary><pre>Top 3：
+symbol  trades  volume  amount_yuan
+S008       250  111900  1.331546e6
+S007       250  111900  1.303571e6
+S006       250  111900  1.275596e6
+
+EXPLAIN ANALYZE 关键信息：
+Total Time: 0.0100s
+TOP_N ← HASH_GROUP_BY ← PROJECTION ← TABLE_SCAN
+TABLE_SCAN Projections: symbol, Volume, Price
+File Filters: date = 20260630
+Scanning Files: 1/6; Total Files Read: 1; Rows: 2,000</pre><p class="run-note">日期分区过滤让 DuckDB 只读取 6 个文件中的 1 个，再对其中 2,000 行聚合。</p></details>
+      <div class="observe"><b>预期观察：</b>执行计划不仅告诉你“总共多久”，还能看到扫描、过滤、聚合和 Top-K 等操作。对多文件读取，计划还能帮助确认实际读了哪些文件。</div>
+      <div class="question"><b>问题解释：</b><code>SELECT *</code> 要求扫描器准备全部列；显式选择 3 列则允许列剪枝，只读取相关列页。列越宽、无关列越多，I/O、解压、解码和中间结果内存之间的差距越明显。<code>EXPLAIN ANALYZE</code> 应重点查看 Parquet 扫描列、过滤条件、处理行数以及聚合和 Top-N 的耗时。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：依次运行 5 条 SQL 并打印实际执行计划</span><button class="copy">复制</button></div><pre><code>import duckdb
+
+source = """read_parquet(
+    'data/lake/**/data_*.parquet', hive_partitioning = true
+)"""
+
+# 五条查询逐步增加复杂度：全列、列剪枝、聚合、Top-N、分类汇总。
+# 课堂上对照前两条计划，最容易观察 SELECT * 与只选三列的差别。
+queries = {
+    "01_SELECT_STAR": f"""
+        SELECT * FROM {source}
+        WHERE date = '20260630' LIMIT 1000
+    """,
+    "02_THREE_COLUMNS": f"""
+        SELECT symbol, Price, Volume FROM {source}
+        WHERE date = '20260630' LIMIT 1000
+    """,
+    "03_DAILY_SUMMARY": f"""
+        SELECT symbol, count(*) AS trades, sum(Volume) AS volume
+        FROM {source} WHERE date = '20260630'
+        GROUP BY symbol
+    """,
+    "04_TOP_AMOUNT": f"""
+        SELECT symbol, sum(Price * Volume) / 100 AS amount_yuan
+        FROM {source} WHERE date = '20260630'
+        GROUP BY symbol ORDER BY amount_yuan DESC LIMIT 10
+    """,
+    "05_BUY_SELL_FLAGS": f"""
+        SELECT BSFlag, count(*) AS trades, sum(Volume) AS volume
+        FROM {source} WHERE date = '20260630'
+        GROUP BY BSFlag ORDER BY BSFlag
+    """,
+}
+
+# 每条 SQL 先显示少量结果，再显示真实执行计划，避免只看耗时数字。
+for name, sql in queries.items():
+    print("\n" + "=" * 20, name, "=" * 20)
+    result = duckdb.sql(sql).fetchall()
+    plan = duckdb.sql("EXPLAIN ANALYZE " + sql).fetchall()[0][1]
+    print("结果前 5 行:", result[:5])
+    # 在 PARQUET_SCAN 节点中关注读取列、过滤条件和处理行数。
+    print(plan)</code></pre></div>
+      <details class="run-result"><summary>✓ 5 条 SQL 均已实际执行 · 展开查看摘要</summary><pre>01_SELECT_STAR      返回 1,000 行；扫描列: 8
+02_THREE_COLUMNS    返回 1,000 行；扫描列: 3
+03_DAILY_SUMMARY    返回 8 组；每组 250 笔、Volume=111900
+04_TOP_AMOUNT       Top 1: ('S008', 1331546.0)
+05_BUY_SELL_FLAGS   [(0, 672, 299200),
+                     (1, 664, 300000),
+                     (2, 664, 296000)]
+
+五个查询都只扫描 date=20260630 对应的 1/6 文件。</pre><p class="run-note"><code>SELECT *</code> 计划要准备全部 8 列，而第二条只准备 3 列。</p></details>
+    </section>
+
+    <section class="lesson" id="t5">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 05 · CACHE</div><h2>缓存是什么：结果副本、命中与失效</h2><p class="subtitle">缓存先把一次费时计算的结果保存起来，下次条件完全相同时直接复用，避免重复查询和计算。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>先能用自己的话说明“缓存是一份可以丢掉并重新计算的结果副本”；再区分缓存键、命中、未命中、LRU 和失效。</div></div>
+      <div class="plain-example"><b>直观例子：</b>第一次计算“2026-06-30 成交额最高的股票”时，DuckDB 要读 Parquet、分组、求和、排序。当前自编数据只有 8 只股票，缓存会把这 8 行结果暂存在内存里。再查完全相同的问题时，可直接返回这 8 行，不再执行 SQL。</div>
+      <div class="benefit-block">
+        <h3>缓存有什么好处</h3>
+        <p class="benefit-lead">缓存保存的是“可以从原始数据重新算出来”的副本，用额外空间换取更少的重复计算。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>重复查询更快</b><p>相同缓存键命中时，省去文件扫描、分组、排序等完整计算路径，只返回已经得到的结果。</p></div>
+          <div class="benefit-item"><b>减少磁盘与 CPU 压力</b><p>热点日期或热点参数被频繁访问时，底层 Parquet 和查询引擎不必反复承担同一工作。</p></div>
+          <div class="benefit-item"><b>延迟更稳定</b><p>命中缓存的请求不再依赖当时的磁盘状态和查询负载，响应时间通常比重新计算更可预测。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>缓存会占用内存，最难的是失效。缓存键若没有包含数据版本，就可能很快地返回旧答案；结果本来就很便宜或几乎不重复时，缓存反而增加复杂度。</p>
+      </div>
+      <div class="foundation">
+        <h3>一句话定义缓存</h3>
+        <p><b>缓存（cache）是为了下次更快而保留的结果副本。</b>在本节代码中，真实数据源仍然是 Parquet，DuckDB 仍然是计算引擎，缓存只是 Python 进程内存里的一份“已算好答案”。</p>
+        <div class="term-grid">
+          <div class="term-card"><b>缓存键（key）</b><p>结果的身份证。本例是 <code>(date, data_version)</code>，例如 <code>('20260630', 'v1')</code>。</p></div>
+          <div class="term-card"><b>缓存值（value）</b><p>这个键对应的已计算结果，即成交额排名前 10 的列表。</p></div>
+          <div class="term-card"><b>命中（hit）</b><p>键已经存在：直接取结果，不进入函数体，所以 SQL 不会再执行。</p></div>
+          <div class="term-card"><b>未命中（miss）</b><p>键不存在：正常执行 SQL，得到结果后再存一份。Miss 不是错误。</p></div>
+        </div>
+        <div class="walkthrough">
+          <div class="walk-step"><b>第一次调用 <code>top_amount('20260630', 'v1')</code>：</b>内存里没有这个键 → miss → 执行 DuckDB 查询 → 保存结果。</div>
+          <div class="walk-step"><b>第二次调用同样参数：</b>键已存在 → hit → 直接返回结果，函数里的 SQL 不再运行。</div>
+          <div class="walk-step"><b>第三次改成 <code>v2</code>：</b>键变为 <code>('20260630', 'v2')</code> → 对缓存来说是新问题 → miss → 重新查询。</div>
+        </div>
+        <table class="mini-table"><thead><tr><th>调用</th><th>查找的键</th><th>结果</th><th>是否执行 SQL</th></tr></thead><tbody>
+          <tr><td>第 1 次 v1</td><td><code>(20260630, v1)</code></td><td>miss</td><td>是</td></tr>
+          <tr><td>第 2 次 v1</td><td><code>(20260630, v1)</code></td><td>hit</td><td>否</td></tr>
+          <tr><td>第 3 次 v2</td><td><code>(20260630, v2)</code></td><td>miss</td><td>是</td></tr>
+        </tbody></table>
+        <h3><code>@lru_cache(maxsize=128)</code> 又是什么</h3>
+        <p>它是 Python 提供的函数缓存装饰器。可以把它理解为：在 <code>top_amount</code> 外面包一层自动字典，用所有函数参数组成键，用返回值作为值。<code>maxsize=128</code> 表示最多保留 128 个不同键；满了以后，LRU（Least Recently Used）优先淘汰最久没用的那一个。</p>
+        <div class="why-box"><b>缓存不是永久存储。</b> 本例的 <code>lru_cache</code> 在 Python 进程退出后就消失；即使消失也没有丢失原始数据，只是下次需要重新计算。</div>
+      </div>
+      <div class="knowledge-slide" aria-label="缓存命中、未命中与版本失效流程">
+        <div class="knowledge-title"><b>知识讲解：缓存是一个带有身份和生命周期的结果副本</b><span>identity · capacity · invalidation</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. 缓存键定义结果身份</b><p>查询日期、字段、过滤条件和数据版本中任意一项改变，都可能产生不同结果。这些维度应全部进入缓存键。</p></div>
+            <div class="concept-item"><b>2. 命中与未命中</b><p>命中时直接复用结果；未命中时执行原始查询并写回缓存。冷查询和热查询的延迟应分开测量。</p></div>
+            <div class="concept-item"><b>3. LRU 与失效</b><p>LRU 在容量满时淘汰最久未使用项，解决“存不下”。版本号、文件哈希或显式清理解决“结果已过期”。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">一次查询的缓存路由</div>
+            <div class="key-chip">key = (date=20260630, fields, filters, data_version=v2)</div>
+            <div class="branch-flow">
+              <div class="diagram-node"><strong>查询请求</strong><small>标准化参数并生成键</small></div>
+              <div class="diagram-arrow">→</div>
+              <div class="branch">
+                <div class="diagram-node hit"><strong>HIT</strong><small>键存在：直接返回结果</small></div>
+                <div class="diagram-node miss"><strong>MISS</strong><small>键不存在：查 DuckDB → 写缓存 → 返回</small></div>
+              </div>
+            </div>
+            <div class="diagram-flow">
+              <div class="diagram-node"><strong>数据 v1</strong><small>key 含 v1</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>底层更新为 v2</strong><small>内容已变更</small></div><div class="diagram-arrow">→</div>
+              <div class="diagram-node"><strong>key 必须变为 v2</strong><small>否则可能返回过期的 v1</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">缓存正确性无法由命中率或延迟保证。只有当缓存键完整表达输入与数据版本时，“命中”才意味着可以复用的同一结果。</div>
+      </div>
+      <div class="foundation">
+        <h3>为什么键里还要放“数据版本”</h3>
+        <p>假设 9:00 查询 20260630，得到结果 A，缓存键只是 <code>20260630</code>。10:00 时 Parquet 被更正，正确结果应变成 B。如果再查时仍只用日期当键，系统会命中旧结果 A：它很快，但是错的。</p>
+        <div class="diagram-flow">
+          <div class="diagram-node"><strong>9:00 · 数据 v1</strong><small>key=(20260630,v1) → 结果 A</small></div><div class="diagram-arrow">→</div>
+          <div class="diagram-node"><strong>10:00 · 数据更正为 v2</strong><small>相同日期，底层内容已不同</small></div><div class="diagram-arrow">→</div>
+          <div class="diagram-node"><strong>key=(20260630,v2)</strong><small>新 key 未命中 → 重算得到 B</small></div>
+        </div>
+        <p><b>失效（invalidation）</b>就是“不再使用已过时的缓存结果”。本节不是手工删除 A，而是让 v2 生成新键，自然不会命中 v1。</p>
+      </div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：比较缓存命中与数据版本变化</span><button class="copy">复制</button></div><pre><code>from functools import lru_cache
+from time import perf_counter
+import duckdb
+
+# 装饰器在函数外面增加一层内存缓存。
+# 调用时它先用全部函数参数组成 key，再决定是直接返回还是进入函数体。
+# maxsize=128 表示最多保留 128 组不同 key 对应的结果。
+@lru_cache(maxsize=128)
+def top_amount(date: str, data_version: str):
+    # 只有 miss 时才会进入这个函数体并执行 SQL。
+    # data_version 不用于 SQL 过滤，但它仍是函数参数，因此参与 key。
+    # 这样 v2 不会命中 v1 时算出的旧结果。
+    return duckdb.execute("""
+        SELECT symbol, sum(Price * Volume) / 100 AS amount
+        FROM read_parquet('data/lake/**/data_*.parquet', hive_partitioning=true)
+        -- 问号是参数占位符，不把外部字符串直接拼进 SQL。
+        WHERE date = ?
+        GROUP BY symbol ORDER BY amount DESC LIMIT 10
+    """, [date]).fetchall()
+
+# 三次调用的 key 依次是 (20260630,v1)、(20260630,v1)、(20260630,v2)。
+# cache_info() 中 hits 是直接复用次数，misses 是实际进入函数体的次数。
+for version in ["v1", "v1", "v2"]:
+    t0 = perf_counter()
+    top_amount("20260630", version)
+    print(version, perf_counter() - t0, top_amount.cache_info())</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>v1  0.008118 s  CacheInfo(hits=0, misses=1, currsize=1)
+v1  0.000001 s  CacheInfo(hits=1, misses=1, currsize=1)
+v2  0.006023 s  CacheInfo(hits=1, misses=2, currsize=2)</pre><p class="run-note"><code>hits</code> 是复用旧结果的次数，<code>misses</code> 是真正执行函数的次数，<code>currsize</code> 是当前保存了几个 key。所以三行结果正好表示“miss → hit → miss”。</p></div>
+      <div class="observe"><b>预期观察：</b>第二个 <code>v1</code> 直接命中缓存；<code>v2</code> 被视为新数据，不复用 <code>v1</code> 结果。这比“猜测多久过期”更明确。</div>
+      <div class="question"><b>问题解释：</b>数据版本不一定要人工填写。可以将文件相对路径、大小、修改时间和内容哈希组合成稳定指纹；元数据指纹计算快但只能间接判断变化，内容哈希更可靠但需要读取全部字节。生产系统还可使用数据发布批次号、对象存储 ETag 或数据湖快照 ID。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：自动生成数据指纹并验证缓存失效</span><button class="copy">复制</button></div><pre><code>from functools import lru_cache
+from hashlib import sha256
+from pathlib import Path
+from time import perf_counter
+import duckdb
+
+DATA_ROOT = Path("data/lake")
+
+# 指纹只读取文件元数据，速度快；它不等同于逐字节内容哈希。
+def data_fingerprint(root: Path) -&gt; str:
+    records = []
+    for path in sorted(root.rglob("*.parquet")):
+        stat = path.stat()
+        # 相对路径、大小或修改时间任一变化，最终 SHA-256 都会变化。
+        records.append(
+            f"{path.relative_to(root)}|{stat.st_size}|{stat.st_mtime_ns}"
+        )
+    return sha256("\n".join(records).encode()).hexdigest()[:16]
+
+@lru_cache(maxsize=128)
+def cached_top_amount(date: str, fingerprint: str):
+    # fingerprint 虽未出现在 SQL 中，但它是函数参数，因此进入缓存键。
+    return duckdb.execute("""
+        SELECT symbol, sum(Price * Volume) / 100 AS amount
+        FROM read_parquet('data/lake/**/data_*.parquet', hive_partitioning=true)
+        WHERE date = ? GROUP BY symbol
+        ORDER BY amount DESC LIMIT 10
+    """, [date]).fetchall()
+
+# 同时显示耗时与 cache_info，区分“很快”和“确实命中缓存”。
+def run(label, version):
+    start = perf_counter()
+    cached_top_amount("20260630", version)
+    print(label, round((perf_counter() - start) * 1000, 3), "ms",
+          cached_top_amount.cache_info())
+
+version_1 = data_fingerprint(DATA_ROOT)
+run("第一次：冷查询", version_1)
+run("第二次：缓存命中", version_1)
+
+# 只改变演示文件的修改时间，模拟一次新的数据发布。
+target = next(DATA_ROOT.rglob("*.parquet"))
+target.touch()
+version_2 = data_fingerprint(DATA_ROOT)
+run("数据版本变化后", version_2)
+
+# 通过断言把课堂观察变成可自动检查的结论。
+assert version_1 != version_2
+assert cached_top_amount.cache_info().misses == 2</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>第一次：冷查询     8.682 ms  hits=0, misses=1
+第二次：缓存命中   0.001 ms  hits=1, misses=1
+数据版本变化后     5.835 ms  hits=1, misses=2</pre><p class="run-note">文件修改时间变化后，数据指纹确实改变，两个自动断言均通过。</p></div>
+    </section>
+
+    <section class="lesson" id="t6">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 06 · ZARR</div><h2>Zarr 3：分块存储多维数组</h2><p class="subtitle">当数据天然表示为“日期 × 股票 × 特征”或更高维张量时，Zarr 使用 NumPy 风格索引、Chunk 和 Shard 组织可局部读取的持久化数组。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>理解数组形状、Chunk 与 Shard 的不同职责；能根据常见切片方向选择 Chunk 形状，并说明 Zarr 与 Parquet 各自适合的数据模型。</div></div>
+      <div class="plain-example"><b>直观例子：</b>本节只使用 4 天 × 6 只虚构股票 × 3 个因子，共 72 个自编数值。数组形状写作 <code>(4, 6, 3)</code>。例如 <code>cube[0, 1, 0] = 0.02</code>，明确表示“第 1 天、S002、momentum”的值。</div>
+      <div class="benefit-block">
+        <h3>Zarr 为什么要使用 Chunk</h3>
+        <p class="benefit-lead">巨大数组若保存成一个不可分割的数据块，取一个坐标也可能需要读取整块。Chunk 把数组切成可独立定位、压缩和处理的最小逻辑块。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>局部读取</b><p>只定位与切片相交的 Chunk。本例取 <code>[0:2,0:3,:]</code> 时覆盖 18 个值，而不是整个数组的 72 个值。</p></div>
+          <div class="benefit-item"><b>独立压缩与解压</b><p>每个 Chunk 单独编码；读取一个切片时，不必先把其他 Chunk 解压到内存，降低无关 I/O 和峰值工作内存。</p></div>
+          <div class="benefit-item"><b>便于并行处理</b><p>不同 Chunk 可以交给不同任务读取、计算或写入。数组足够大且存储系统允许并发时，可以利用多个核心或工作节点。</p></div>
+          <div class="benefit-item"><b>局部更新</b><p>修改少量坐标时，逻辑上只需定位受影响的 Chunk，而不必重写整个数组；若使用 Shard，物理重写范围还取决于存储实现。</p></div>
+          <div class="benefit-item"><b>Shard 控制对象数量</b><p>Chunk 很细会产生大量小对象。Zarr 3 可把多个 Chunk 装进一个 Shard，同时保留 Chunk 级索引。</p></div>
+        </div>
+        <table class="mini-table"><thead><tr><th>读取请求</th><th>不做局部分块时</th><th>Chunk=(2,3,3) 时</th><th>本例收益</th></tr></thead><tbody>
+          <tr><td>一个坐标 <code>[0,1,0]</code></td><td>覆盖整个数组 72 值</td><td>命中 1 Chunk，覆盖 18 值</td><td>少覆盖 54 值，即 75%</td></tr>
+          <tr><td>精确切片 <code>[0:2,0:3,:]</code></td><td>覆盖 72 值</td><td>请求 18、覆盖 18 值</td><td>读取放大 1.00×</td></tr>
+          <tr><td>跨边界 <code>[1:4,2:5,:]</code></td><td>覆盖 72 值</td><td>请求 27、命中 4 Chunk、覆盖 72 值</td><td>没有减少覆盖，放大 2.67×</td></tr>
+        </tbody></table>
+        <p class="benefit-limit"><b>代价与适用边界：</b>Chunk 不是越小越好。过大会读入大量无关值；过小会增加元数据、对象数量、打开请求和调度成本。应让 Chunk 形状尽量贴近最常见的切片形状。</p>
+      </div>
+      <div class="foundation">
+        <h3>先弄懂三维数组中的一个坐标</h3>
+        <p>源文件 <code>data/factor-values.csv</code> 有 24 行，每行是一组“日期 + 股票”，后面跟 3 个因子。把它变成 Zarr 时，行和列不再只是二维表，而是三个有固定顺序的轴。</p>
+        <div class="axis-cards">
+          <div class="axis-card"><b>轴 0 · date</b><code>[0627, 0628, 0629, 0630]</code><small>长度 4；索引 0 代表 20260627。</small></div>
+          <div class="axis-card"><b>轴 1 · symbol</b><code>[S001, S002, …, S006]</code><small>长度 6；索引 1 代表 S002。</small></div>
+          <div class="axis-card"><b>轴 2 · feature</b><code>[momentum, volatility, quality]</code><small>长度 3；索引 0 代表 momentum。</small></div>
+        </div>
+        <div class="cube-coordinate">
+          <div><b>CSV 中的一行</b>20260627 · S002<br>momentum = 0.02</div>
+          <i>→</i>
+          <div><b>Zarr 中的一个坐标</b><code>cube[0, 1, 0]</code><br>= 0.02</div>
+        </div>
+        <h4>只看 momentum 时，4 × 6 的数值平面</h4>
+        <table class="mini-table"><thead><tr><th>date</th><th>S001</th><th>S002</th><th>S003</th><th>S004</th><th>S005</th><th>S006</th></tr></thead><tbody>
+          <tr><td>20260627</td><td>0.01</td><td>0.02</td><td>0.03</td><td>0.04</td><td>0.05</td><td>0.06</td></tr>
+          <tr><td>20260628</td><td>0.07</td><td>0.08</td><td>0.09</td><td>0.10</td><td>0.11</td><td>0.12</td></tr>
+          <tr><td>20260629</td><td>0.13</td><td>0.14</td><td>0.15</td><td>0.16</td><td>0.17</td><td>0.18</td></tr>
+          <tr><td>20260630</td><td>0.19</td><td>0.20</td><td>0.21</td><td>0.22</td><td>0.23</td><td>0.24</td></tr>
+        </tbody></table>
+        <div class="why-box"><b>Shape <code>(4, 6, 3)</code> 不是“有三个数组”。</b>它表示同一个数组有三条轴；总元素数是 <code>4 × 6 × 3 = 72</code>。每个元素都是一个 <code>float32</code> 数字。</div>
+      </div>
+      <div class="knowledge-slide" aria-label="Zarr 多维数组的分块与分片结构">
+        <div class="knowledge-title"><b>知识讲解：把一个巨大数组拆成可以独立读取的小块</b><span>shape · chunk · shard · NumPy-style slicing</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. Shape 回答“数组有多大”</b><p><code>(4, 6, 3)</code> 规定三个轴的长度和坐标范围；它不决定磁盘怎么切块。数据类型为 <code>float32</code> 时，未压缩逻辑大小是 <code>72 × 4 = 288 bytes</code>。</p></div>
+            <div class="concept-item"><b>2. Chunk 回答“一次最少读哪一块”</b><p>本例 Chunk 为 <code>(2, 3, 3)</code>：一次覆盖 2 天、3 只股票、全部 3 个因子，共 <code>18</code> 个值。即使只要其中一个值，底层也要定位并解压它所在的 Chunk。</p></div>
+            <div class="concept-item"><b>3. Shard 回答“多少 Chunk 装进一个对象”</b><p>Shard 为 <code>(4, 6, 3)</code>，刚好包住整个小数组，也就是 4 个 Chunk。读取器仍能根据 Shard 内部索引找到单个 Chunk，不必解压整个 Shard。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">Chunk=(2 天, 3 股票, 3 因子) 后得到 2 × 2 个块</div>
+            <div class="cube-map" role="img" aria-label="四天六只股票被分成四个 Chunk，左上 Chunk 精确命中第一个切片">
+              <div class="cube-head">date \ symbol</div><div class="cube-head">S001–S003</div><div class="cube-head">S004–S006</div>
+              <div class="cube-head">0627–0628</div><div class="cube-cell exact"><b>Chunk (0,0,0)</b>2 × 3 × 3 = 18 值<small>切片 [0:2, 0:3, :] 精确命中</small></div><div class="cube-cell"><b>Chunk (0,1,0)</b>2 × 3 × 3 = 18 值</div>
+              <div class="cube-head">0629–0630</div><div class="cube-cell"><b>Chunk (1,0,0)</b>2 × 3 × 3 = 18 值</div><div class="cube-cell"><b>Chunk (1,1,0)</b>2 × 3 × 3 = 18 值</div>
+            </div>
+            <div class="visual-label">两个具体切片的读取放大</div>
+            <div class="io-equation">
+              <div><b>切片 A · 18 值</b><code>[0:2, 0:3, :]</code><br>命中 1 Chunk → 覆盖 18 值<br>放大 1.00×</div>
+              <div><b>切片 B · 27 值</b><code>[1:4, 2:5, :]</code><br>跨越四条边界 → 命中 4 Chunk</div>
+              <div><b>实际覆盖 72 值</b>4 Chunk × 18 值<br>读取放大 <code>72/27 = 2.67×</code></div>
+            </div>
+            <div class="shard-pack"><b>Shard (4,6,3)：一个存储对象中装入四个 Chunk</b><div class="shard-pack-grid"><span>Chunk (0,0,0)</span><span>Chunk (0,1,0)</span><span>Chunk (1,0,0)</span><span>Chunk (1,1,0)</span></div></div>
+          </div>
+        </div>
+        <div class="slide-caption">Chunk 决定逻辑读取粒度，Shard 决定外部文件或对象数量。Parquet 更擅长“按列名过滤、分组和聚合”的表格；Zarr 更擅长“按坐标范围切片”的固定维度数组。</div>
+      </div>
+      <div class="question"><b>怎么选择 Chunk：</b>先写下最常见的切片。例如经常读取“2 天 × 3 只股票 × 全部因子”，选择 <code>(2,3,3)</code> 可以让一次查询精确命中一个 Chunk。若改成 <code>(4,6,3)</code>，查同样的 18 个值会覆盖 72 个值，放大到 4×；若改成 <code>(1,1,3)</code>，读取很精细，却会产生 <code>4×6=24</code> 个小 Chunk。Chunk 的本质是在“少读无关数据”和“少管理小块”之间取舍。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示：把自编因子 CSV 变成 Zarr，并计算两个切片命中多少 Chunk</span><button class="copy">复制</button></div><pre><code>from itertools import product
+from pathlib import Path
+import shutil
+import numpy as np
+import polars as pl
+import zarr
+
+# 源数据是 prepare_demo.py 生成的 24 行自编 CSV。
+source = (
+    pl.read_csv("data/factor-values.csv")
+    .sort(["date", "symbol"])
+)
+dates = source["date"].unique(maintain_order=True).to_list()
+symbols = source["symbol"].unique(maintain_order=True).to_list()
+features = ["momentum", "volatility", "quality"]
+
+# CSV 每一行有 3 个因子；reshape 后三个轴依次是 date、symbol、feature。
+values = (
+    source.select(features).to_numpy()
+    .astype("float32")
+    .reshape(len(dates), len(symbols), len(features))
+)
+
+store = Path("data/factors.zarr")
+if store.exists():
+    shutil.rmtree(store)
+
+chunks = (2, 3, 3)   # 每块：2 天 × 3 股票 × 3 因子 = 18 个值
+shards = (4, 6, 3)   # 一个 Shard 装下 2 × 2 × 1 = 4 个 Chunk
+cube = zarr.create_array(
+    store=str(store), shape=values.shape,
+    chunks=chunks, shards=shards,
+    dtype="float32", zarr_format=3,
+)
+cube[:] = values
+reopened = zarr.open_array(str(store), mode="r")
+
+# 根据切片的起止坐标，列出每个轴上相交的 Chunk 编号。
+def touched_chunk_ids(slices, chunk_shape):
+    ranges = []
+    for part, chunk_size in zip(slices, chunk_shape):
+        first = part.start // chunk_size
+        last = (part.stop - 1) // chunk_size
+        ranges.append(range(first, last + 1))
+    return list(product(*ranges))
+
+exact_slice = (slice(0, 2), slice(0, 3), slice(0, 3))
+wide_slice = (slice(1, 4), slice(2, 5), slice(0, 3))
+exact = reopened[exact_slice]
+wide = reopened[wide_slice]
+exact_ids = touched_chunk_ids(exact_slice, chunks)
+wide_ids = touched_chunk_ids(wide_slice, chunks)
+
+print("source rows:", source.height)
+print("shape / chunks / shards:", reopened.shape, reopened.chunks, reopened.shards)
+print("cube[0,1,0] =", reopened[0, 1, 0], "→ 20260627 / S002 / momentum")
+print("exact momentum:\n", exact[:, :, 0])
+print("exact chunk ids:", exact_ids, "requested:", exact.size,
+      "covered:", len(exact_ids) * np.prod(chunks))
+print("wide chunk ids :", wide_ids, "requested:", wide.size,
+      "covered:", len(wide_ids) * np.prod(chunks))
+print("wide read amplification:",
+      round(len(wide_ids) * np.prod(chunks) / wide.size, 2), "x")
+
+# 文件重新打开后必须逐值一致，证明数据确实已持久化。
+assert np.allclose(reopened[:], values)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · Zarr 3.2.1</span></div><pre>source rows: 24
+shape / chunks / shards: (4, 6, 3) (2, 3, 3) (4, 6, 3)
+cube[0,1,0] = 0.02 → 20260627 / S002 / momentum
+exact momentum:
+ [[0.01 0.02 0.03]
+  [0.07 0.08 0.09]]
+exact chunk ids: [(0, 0, 0)] requested: 18 covered: 18
+wide chunk ids : [(0,0,0), (0,1,0), (1,0,0), (1,1,0)]
+requested: 27 covered: 72
+wide read amplification: 2.67 x</pre><p class="run-note">第一个切片与一个 Chunk 完全重合；第二个切片虽然只要 27 个值，却跨越 4 个 Chunk，因此底层块覆盖了 72 个值。</p></div>
+      <div class="observe"><b>观察结论：</b>Zarr 的切片语法描述“逻辑上要哪些坐标”，Chunk 决定“底层至少要定位和解压哪些块”。Shard 只改变这些 Chunk 在外部被装进多少个文件或对象，不改变切片结果。</div>
+    </section>
+
+    <section class="lesson" id="t7">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 07 · FREE-THREADED PYTHON</div><h2>Free-threaded Python：没有 GIL 之后会发生什么</h2><p class="subtitle">CPython 3.13 起提供可选的 Free-threaded 构建，使多个 Python 线程能够在不同 CPU 核心上同时执行 Python 字节码。</p></div>
+      </div>
+      <div class="goal"><div><b>学习目标</b>理解 GIL、操作系统线程和 CPU 核心的关系；能用运行时信息判断当前解释器是否支持 Free-threading，并用同一段 CPU 密集代码比较串行与线程池。</div></div>
+      <div class="plain-example"><b>直观例子：</b>有两项各需 40 ms 的纯 Python 计算。普通 CPython 即使开两个线程，某一时刻通常仍只有一个线程在执行 Python 字节码，总计算时间理想下限仍接近 80 ms；Free-threaded 解释器若有两颗空闲核心，理想情况下可让两项任务同时推进，接近 40 ms。</div>
+      <div class="benefit-block">
+        <h3>Free-threaded Python 可能带来什么好处</h3>
+        <p class="benefit-lead">它最重要的变化是：多个线程有机会在不同 CPU 核心上同时执行 Python 字节码，而不再由一个进程级 GIL 把这部分工作串行化。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>纯 Python CPU 任务可真并行</b><p>可拆成独立任务的循环、解析或计算，有机会同时使用多颗核心；普通 CPython 的线程通常只能轮流执行这些字节码。</p></div>
+          <div class="benefit-item"><b>线程共享内存更直接</b><p>线程可以共享同一组 Python 对象，不像多进程那样经常需要复制、序列化或通过进程间通信传递结果。</p></div>
+          <div class="benefit-item"><b>可继续使用线程接口</b><p>已有的 <code>threading</code> 和 <code>ThreadPoolExecutor</code> 模型仍然可用，CPU 并行不一定必须改写成多进程架构。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>并行不是自动加速。线程同步、内存带宽、对象锁和任务粒度都会产生开销；共享状态更容易出现竞态，扩展库也必须确认兼容。I/O 等待在普通 CPython 中原本就能重叠，不需要为了 I/O 单独改用 Free-threaded 构建。</p>
+      </div>
+      <div class="foundation">
+        <h3>GIL 到底是什么</h3>
+        <p><b>GIL 是 Global Interpreter Lock，中文常译为“全局解释器锁”。</b>这里讨论的是最常用的 Python 实现 CPython。普通 CPython 在一个解释器进程内执行 Python 字节码前，线程需要先持有这把锁；因此同一时刻通常只有一个线程真正执行 Python 层代码。</p>
+        <div class="gil-definition">
+          <div><b>进程 Process</b>一个正在运行的 Python 程序，拥有自己的内存空间和一个 GIL。</div>
+          <div><b>线程 Thread</b>进程中的执行路线；多个线程共享列表、字典等内存对象。</div>
+          <div><b>CPU 核心 Core</b>真正执行机器指令的硬件；多核要同时有可运行任务才有价值。</div>
+          <div><b>Python 字节码</b>CPython 解释器执行的中间指令；纯 Python 循环会持续执行大量字节码。</div>
+        </div>
+        <div class="gil-flow">
+          <div><b>创建两个 OS 线程</b>Thread A 与 B 都已经存在，也都可以被操作系统调度。</div>
+          <div><b>A 取得 GIL</b>A 执行一段 Python 字节码；B 即使位于另一核心也暂不能执行 Python 字节码。</div>
+          <div><b>锁发生交接</b>A 遇到 I/O、主动释放或到达切换时机后，B 才有机会取得 GIL。</div>
+          <div><b>结果是并发而非并行</b>A、B 都在推进，但纯 Python CPU 工作通常不是同一时刻在两核执行。</div>
+        </div>
+        <table class="mini-table"><thead><tr><th>说法</th><th>是否正确</th><th>原因</th></tr></thead><tbody>
+          <tr><td>“有 GIL 就不能创建线程”</td><td>错误</td><td>线程真实存在；限制的是同一解释器内同时执行 Python 字节码。</td></tr>
+          <tr><td>“有 GIL，I/O 线程也没用”</td><td>错误</td><td>磁盘、网络或 <code>sleep</code> 等等待期间通常会释放 GIL，其他线程可继续。</td></tr>
+          <tr><td>“GIL 会自动保护业务数据”</td><td>错误</td><td>检查库存和扣减库存是多步逻辑，线程仍可能在步骤之间交错，仍需 <code>Lock</code>。</td></tr>
+          <tr><td>“Free-threaded 一定线性加速”</td><td>错误</td><td>还受线程开销、内存带宽、任务粒度和扩展库兼容性影响。</td></tr>
+        </tbody></table>
+      </div>
+      <div class="knowledge-slide" aria-label="普通 CPython 与 Free-threaded Python 的线程执行对比">
+        <div class="knowledge-title"><b>知识讲解：GIL 从“全局串行门”变成可选机制</b><span>GIL · OS threads · CPU cores · compatibility</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>1. CPU-bound：线程主要在做计算</b><p>例如 150 万轮纯 Python 整数运算。普通 CPython 的四个线程会轮流持有 GIL，因此总耗时通常与串行接近，甚至因切换稍慢。</p></div>
+            <div class="concept-item"><b>2. I/O-bound：线程大部分时间在等待</b><p>例如四个任务各等待 0.12 秒。等待时线程不需要执行 Python 字节码并可释放 GIL，因此等待能够重叠，总时间可从约 0.48 秒降到约 0.12 秒。</p></div>
+            <div class="concept-item"><b>3. Free-threaded：CPU 线程有机会真并行</b><p>关闭 GIL 后，多个线程可同时执行 Python 代码，但共享对象需要更细粒度的线程安全机制。部分不兼容扩展还可能在导入时重新启用 GIL。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="visual-label">每个格子代表同一小段时间；A/B 表示正在执行 Python 计算</div>
+            <div class="timeline">
+              <div class="timeline-case"><b>普通 CPython · 两个 CPU 线程轮流持有 GIL</b>
+                <div class="timeline-row"><span>取得 GIL</span><div class="timeline-track"><span class="timeline-slot a">A</span><span class="timeline-slot a">A</span><span class="timeline-slot b">B</span><span class="timeline-slot b">B</span><span class="timeline-slot a">A</span><span class="timeline-slot a">A</span><span class="timeline-slot b">B</span><span class="timeline-slot b">B</span></div></div>
+                <div class="timeline-row"><span>另一核心</span><div class="timeline-track"><span class="timeline-slot wait">B 等待</span><span class="timeline-slot wait">B 等待</span><span class="timeline-slot wait">A 等待</span><span class="timeline-slot wait">A 等待</span><span class="timeline-slot wait">B 等待</span><span class="timeline-slot wait">B 等待</span><span class="timeline-slot wait">A 等待</span><span class="timeline-slot wait">A 等待</span></div></div>
+              </div>
+              <div class="timeline-case"><b>Free-threaded · 两颗核心可同时推进两个 CPU 线程</b>
+                <div class="timeline-row"><span>Core 1</span><div class="timeline-track"><span class="timeline-slot a">A</span><span class="timeline-slot a">A</span><span class="timeline-slot a">A</span><span class="timeline-slot a">A</span><span class="timeline-slot idle">完成</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span></div></div>
+                <div class="timeline-row"><span>Core 2</span><div class="timeline-track"><span class="timeline-slot b">B</span><span class="timeline-slot b">B</span><span class="timeline-slot b">B</span><span class="timeline-slot b">B</span><span class="timeline-slot idle">完成</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span></div></div>
+              </div>
+              <div class="timeline-case"><b>普通 CPython 的 I/O 线程 · 等待可以重叠</b>
+                <div class="timeline-row"><span>Thread A</span><div class="timeline-track"><span class="timeline-slot a">发起 I/O</span><span class="timeline-slot wait">等待</span><span class="timeline-slot wait">等待</span><span class="timeline-slot wait">等待</span><span class="timeline-slot a">处理结果</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span></div></div>
+                <div class="timeline-row"><span>Thread B</span><div class="timeline-track"><span class="timeline-slot idle">—</span><span class="timeline-slot b">发起 I/O</span><span class="timeline-slot wait">等待</span><span class="timeline-slot wait">等待</span><span class="timeline-slot wait">等待</span><span class="timeline-slot b">处理结果</span><span class="timeline-slot idle">—</span><span class="timeline-slot idle">—</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">GIL 限制的是普通 CPython 中“同时执行 Python 字节码”的线程数量，不等于整个进程永远只使用一颗核心。NumPy、Polars 等扩展可能在 C/Rust 层释放 GIL 或使用自己的线程池。</div>
+      </div>
+      <div class="question"><b>应该选择哪种并发方式：</b>大量网络、磁盘等待可先考虑线程或异步 I/O；纯 Python CPU 计算在普通 CPython 中可考虑多进程，或使用 Free-threaded 构建做对照实验；已经由 NumPy、Polars 等库执行的向量化计算，应先确认库是否已有内部并行。无论选择哪种方式，都必须用相同输入确认结果一致，并实际测量而不是只数 CPU 核心。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示一：同一批自编任务，比较 CPU 计算与 I/O 等待</span><button class="copy">复制</button></div><pre><code>from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from time import perf_counter, sleep
+import csv
+import sys
+import sysconfig
+
+# 读取 prepare_demo.py 生成的 8 项任务，不在计时阶段临时改变输入。
+with Path("data/thread-tasks.csv").open(encoding="utf-8") as file:
+    tasks = list(csv.DictReader(file))
+cpu_tasks = [task for task in tasks if task["kind"] == "cpu"]
+io_tasks = [task for task in tasks if task["kind"] == "io"]
+
+def cpu_work(task):
+    """纯 Python 整数循环：大部分时间都在执行 Python 字节码。"""
+    value = int(task["seed"])
+    checksum = 0
+    for _ in range(int(task["rounds"])):
+        value = (value * 1_664_525 + 1_013_904_223) &amp; 0xFFFFFFFF
+        checksum ^= value
+    return checksum
+
+def io_wait(task):
+    """sleep 模拟磁盘或网络等待；等待期间线程不占用 CPU。"""
+    sleep(float(task["delay_seconds"]))
+    return task["task"]
+
+def measure(work, selected_tasks, use_threads):
+    start = perf_counter()
+    if use_threads:
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            result = list(pool.map(work, selected_tasks))
+    else:
+        result = [work(task) for task in selected_tasks]
+    return result, perf_counter() - start
+
+cpu_serial, cpu_serial_s = measure(cpu_work, cpu_tasks, False)
+cpu_threads, cpu_threads_s = measure(cpu_work, cpu_tasks, True)
+io_serial, io_serial_s = measure(io_wait, io_tasks, False)
+io_threads, io_threads_s = measure(io_wait, io_tasks, True)
+
+free_threaded_build = bool(sysconfig.get_config_var("Py_GIL_DISABLED"))
+gil_enabled = sys._is_gil_enabled() if hasattr(sys, "_is_gil_enabled") else True
+print("Free-threaded build:", free_threaded_build)
+print("GIL currently enabled:", gil_enabled)
+print("CPU tasks:", len(cpu_tasks), "×", cpu_tasks[0]["rounds"], "rounds")
+print("CPU serial / threads:", round(cpu_serial_s, 3), "/",
+      round(cpu_threads_s, 3), "s")
+print("CPU thread speedup:", round(cpu_serial_s / cpu_threads_s, 2), "x")
+print("I/O tasks:", len(io_tasks), "×", io_tasks[0]["delay_seconds"], "s wait")
+print("I/O serial / threads:", round(io_serial_s, 3), "/",
+      round(io_threads_s, 3), "s")
+print("I/O thread speedup:", round(io_serial_s / io_threads_s, 2), "x")
+print("CPU results equal:", cpu_serial == cpu_threads)
+print("I/O results equal :", io_serial == io_threads)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · 普通 CPython 3.14.3</span></div><pre>Free-threaded build: False
+GIL currently enabled: True
+CPU tasks: 4 × 1500000 rounds
+CPU serial / threads: 0.444 / 0.430 s
+CPU thread speedup: 1.03 x
+I/O tasks: 4 × 0.12 s wait
+I/O serial / threads: 0.495 / 0.125 s
+I/O thread speedup: 3.97 x
+CPU results equal: True
+I/O results equal : True</pre><p class="run-note">同一解释器、同样四个线程：纯 Python CPU 循环没有加速，而四段等待几乎完全重叠。差别来自任务性质，不是“线程是否真的创建”。</p></div>
+      <div class="observe"><b>如何在 Free-threaded Python 上复现：</b>使用 <code>python3.14t</code> 等 Free-threaded 解释器运行同一文件，并确认输出中的 <code>Free-threaded build: True</code> 与 <code>GIL currently enabled: False</code>。再比较 CPU thread speedup；不要拿两份不同输入或不同轮数的结果比较。</div>
+      <div class="demo"><div class="demo-title"><span>课堂演示二：有 GIL 仍会超卖；Lock 保护的是完整业务步骤</span><button class="copy">复制</button></div><pre><code>from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from threading import Barrier, Lock
+import csv
+
+with Path("data/orders.csv").open(encoding="utf-8") as file:
+    orders = list(csv.DictReader(file))
+initial_stock = int(orders[0]["initial_stock"])
+quantities = [int(order["quantity"]) for order in orders]
+
+# 错误版：两线程先后执行 Python 字节码，但“检查”和“扣减”不是同一步。
+# Barrier 故意让两张订单都在库存仍为 10 时完成检查，再继续扣减。
+stock = initial_stock
+checked = Barrier(2)
+def unsafe_buy(quantity):
+    global stock
+    if stock &gt;= quantity:
+        checked.wait()
+        stock -= quantity
+        return True
+    return False
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    unsafe_results = list(pool.map(unsafe_buy, quantities))
+print("unsafe:", unsafe_results, "final stock:", stock)
+
+# 正确版：Lock 把“检查库存 + 扣减库存”包成不可交错的临界区。
+stock = initial_stock
+stock_lock = Lock()
+def safe_buy(quantity):
+    global stock
+    with stock_lock:
+        if stock &gt;= quantity:
+            stock -= quantity
+            return True
+        return False
+
+with ThreadPoolExecutor(max_workers=2) as pool:
+    safe_results = list(pool.map(safe_buy, quantities))
+print("safe  :", safe_results, "final stock:", stock)</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果</span></div><pre>unsafe: [True, True] final stock: -4
+safe  : [True, False] final stock: 3</pre><p class="run-note">GIL 只让 Python 字节码轮流执行，没有把“检查后再扣减”自动变成一个事务。Lock 才保护了完整临界区；这一点在普通和 Free-threaded Python 中都成立。</p></div>
+    </section>
+
+    <section class="lesson" id="t8">
+      <div class="lesson-head">
+        <div><div class="topic-no">TOPIC 08 · END TO END</div><h2>完整例子：从成交明细到可查询的 VWAP 数组</h2><p class="subtitle">用同一份 12,000 行虚构成交数据，把前七个主题连接成一条可以完整运行、交叉验证和重复使用的数据流水线。</p></div>
+      </div>
+      <div class="goal"><div><b>这一节不是再增加一个新工具</b>它要回答的是：CSV、Parquet、分区、Polars、DuckDB、缓存、Zarr 和线程分别应当出现在完整程序的哪一步，以及前一步的输出怎样成为后一步的输入。</div></div>
+      <div class="plain-example"><b>最终问题：</b>给程序一个日期 <code>20260630</code>，找出当天成交额最高的 3 只虚构股票；再处理全部 6 天，把“每日 × 每只股票”的 VWAP 保存成可以按坐标切片的 Zarr 数组。<code>Price</code> 使用整数“分”，因此 VWAP 也以“分”为单位。</div>
+      <div class="benefit-block">
+        <h3>把这些技术串起来有什么好处</h3>
+        <p class="benefit-lead">完整流水线的价值不在于工具数量，而在于每一步都有明确输入、输出和可核对结果。</p>
+        <div class="benefit-grid">
+          <div class="benefit-item"><b>每个工具只负责擅长的部分</b><p>Parquet 负责持久化，分区负责文件剪枝，Polars 和 DuckDB 负责分析，缓存负责复用，Zarr 负责数组切片。</p></div>
+          <div class="benefit-item"><b>中间结果可以单独检查</b><p>日期文件数、Top 3、缓存命中和 Zarr 坐标都能独立核对，出错时更容易定位到具体阶段。</p></div>
+          <div class="benefit-item"><b>同一口径可以交叉验证</b><p>Polars 与 DuckDB 独立计算同一个 Top 3；结果一致比只看到一份“看起来合理”的输出更可靠。</p></div>
+          <div class="benefit-item"><b>一次整理，多种使用方式</b><p>单日查询使用分区 Parquet，多日重复查询使用缓存，规则数组切片使用 Zarr，不必每次从 CSV 重新开始。</p></div>
+        </div>
+        <p class="benefit-limit"><b>代价与适用边界：</b>每增加一层都会增加代码、依赖和维护成本。真实项目应只保留能解决实际瓶颈的步骤，而不是为了“技术齐全”全部照搬。</p>
+      </div>
+      <div class="foundation">
+        <h3>输入、计算目标和最终产物</h3>
+        <table class="mini-table"><thead><tr><th>项目</th><th>本例中的具体内容</th><th>为什么需要它</th></tr></thead><tbody>
+          <tr><td><b>源数据</b></td><td><code>trades.csv</code>：12,000 行，6 天，8 只虚构股票</td><td>CSV 便于直接查看，但不作为反复分析时的最终存储格式。</td></tr>
+          <tr><td><b>单日结果</b></td><td>每只股票的成交笔数、成交量、成交额和 VWAP</td><td>回答“某天哪些股票成交额最高”。</td></tr>
+          <tr><td><b>交叉核对</b></td><td>Polars 表达式和 DuckDB SQL 分别计算同一个 Top 3</td><td>两条独立计算路径结果一致，可以发现字段、公式或过滤条件写错的问题。</td></tr>
+          <tr><td><b>批量产物</b></td><td>Zarr 数组 <code>shape=(6,8)</code>，坐标为“日期 × 股票”</td><td>后续可以快速取得某天全部股票或某只股票的 6 天 VWAP。</td></tr>
+        </tbody></table>
+        <div class="formula-line">成交额 = Price × Volume　　VWAP = Σ(Price × Volume) ÷ ΣVolume</div>
+        <p>例如某股票只有两笔成交：10.00 元成交 100 股，10.20 元成交 300 股。简单平均价格是 10.10 元；VWAP 会考虑第二笔数量更大，所以是 <code>(1000×100 + 1020×300) ÷ 400 = 1015 分</code>，即 10.15 元。</p>
+      </div>
+      <div class="knowledge-slide" aria-label="完整例子从 CSV 到 Zarr 的三阶段数据流">
+        <div class="knowledge-title"><b>同一份数据怎样贯穿七个主题</b><span>建立存储 · 查询复用 · 批量产出</span></div>
+        <div class="knowledge-body">
+          <div class="concept-copy">
+            <div class="concept-item"><b>阶段一 · 先建立可查询的数据</b><p>T1 将 CSV 转为带 ZSTD 压缩和统计信息的 Parquet；T2 再按日期拆成 6 个目录。它们通常在数据到达时运行一次。</p></div>
+            <div class="concept-item"><b>阶段二 · 查询、核对和复用</b><p>T3 用 Lazy API 聚合某一天；T4 用 SQL 交叉核对；T5 让相同日期和相同数据版本直接复用结果。</p></div>
+            <div class="concept-item"><b>阶段三 · 把独立日期批量处理</b><p>T7 用线程池调度 6 个独立日期；T6 把最终 VWAP 变成固定坐标的二维 Zarr 数组。</p></div>
+          </div>
+          <div class="visual-panel">
+            <div class="capstone-lanes">
+              <div class="capstone-lane">
+                <div class="capstone-lane-label">建立存储<br>运行一次</div>
+                <div class="capstone-track">
+                  <div class="capstone-stage"><b>源 CSV</b><small>12,000 行文本</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage"><b>T1 · Parquet</b><small>ZSTD + 统计信息</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage output"><b>T2 · 日期分区</b><small>6 个日期文件</small></div>
+                </div>
+              </div>
+              <div class="capstone-lane">
+                <div class="capstone-lane-label">查询一天<br>按需运行</div>
+                <div class="capstone-track">
+                  <div class="capstone-stage"><b>T3 · Polars</b><small>Lazy 聚合</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage"><b>T4 · DuckDB</b><small>SQL 交叉核对</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage output"><b>T5 · 缓存</b><small>日期 + 数据版本</small></div>
+                </div>
+              </div>
+              <div class="capstone-lane">
+                <div class="capstone-lane-label">处理全部<br>批量运行</div>
+                <div class="capstone-track">
+                  <div class="capstone-stage"><b>6 个日期任务</b><small>彼此没有依赖</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage"><b>T7 · 线程池</b><small>并发读取与聚合</small></div><div class="capstone-arrow">→</div>
+                  <div class="capstone-stage output"><b>T6 · Zarr</b><small>6 天 × 8 股票</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-caption">箭头表达真实的数据依赖：先有 Parquet 和日期分区，查询才能定位所需日期文件；先得到 6 份日汇总，才能组装最终 Zarr 数组。</div>
+      </div>
+      <div class="foundation">
+        <h3>每个主题在代码里只承担一个明确职责</h3>
+        <table class="mini-table"><thead><tr><th>主题</th><th>代码中的位置</th><th>去掉以后会怎样</th></tr></thead><tbody>
+          <tr><td><span class="topic-role">T1</span>表示与压缩</td><td><code>write_parquet(compression="zstd")</code></td><td>只能反复解析体积更大、没有列类型和行组统计的 CSV。</td></tr>
+          <tr><td><span class="topic-role">T2</span>文件布局</td><td><code>PARTITION_BY (date)</code></td><td>查一天时不能先从目录层跳过另外 5 天。</td></tr>
+          <tr><td><span class="topic-role">T3</span>Polars Lazy</td><td><code>scan_parquet → group_by → collect</code></td><td>失去延迟执行和扫描阶段优化这条计算路径。</td></tr>
+          <tr><td><span class="topic-role">T4</span>DuckDB SQL</td><td>另一条 <code>GROUP BY</code> 查询</td><td>缺少独立实现，公式写错时可能只得到一个“看起来合理”的结果。</td></tr>
+          <tr><td><span class="topic-role">T5</span>缓存</td><td><code>@lru_cache</code> + 数据版本</td><td>同一天、同一版本的汇总会被重复计算；只用日期作键又可能返回旧结果。</td></tr>
+          <tr><td><span class="topic-role">T6</span>Zarr</td><td><code>shape=(6,8)</code>、<code>chunks=(1,4)</code></td><td>最终日汇总仍是零散表格，不能直接用二维坐标切片。</td></tr>
+          <tr><td><span class="topic-role">T7</span>并发</td><td><code>ThreadPoolExecutor</code></td><td>6 个互不依赖的文件只能逐个调度；是否加速仍应以真实环境测量为准。</td></tr>
+        </tbody></table>
+      </div>
+      <div class="demo"><div class="demo-title"><span>完整课堂演示：从 CSV 一直运行到 Zarr</span><button class="copy">复制</button></div><pre><code>from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+from pathlib import Path
+import hashlib
+import shutil
+
+import duckdb
+import numpy as np
+import polars as pl
+import zarr
+
+
+SOURCE = Path("data/trades.csv")
+WORK = Path("data/end-to-end")
+PARQUET = WORK / "trades-zstd.parquet"
+LAKE = WORK / "by-date"
+ZARR_STORE = WORK / "daily-vwap.zarr"
+
+# 每次从同一份虚构 CSV 重建结果，确保课堂上可以重复演示。
+if WORK.exists():
+    shutil.rmtree(WORK)
+WORK.mkdir(parents=True)
+
+# T1 · 数据表示：统一类型，再把文本 CSV 写成带统计信息的 ZSTD Parquet。
+trades = pl.read_csv(SOURCE).with_columns(
+    pl.col("date").cast(pl.String),
+    pl.col("Price").cast(pl.Int32),
+    pl.col("Volume").cast(pl.Int32),
+    pl.col("BSFlag").cast(pl.Int8),
+)
+trades.write_parquet(PARQUET, compression="zstd", statistics=True)
+
+# T2 + T4 · 文件布局与 SQL：DuckDB 把总文件拆成 6 个日期目录。
+connection = duckdb.connect()
+connection.execute(f"""
+COPY (SELECT * FROM read_parquet('{PARQUET.as_posix()}'))
+TO '{LAKE.as_posix()}'
+(FORMAT parquet, PARTITION_BY (date), OVERWRITE);
+""")
+daily_files = sorted(LAKE.rglob("data_*.parquet"))
+daily_file_by_date = {
+    path.parent.name.removeprefix("date="): path.resolve()
+    for path in daily_files
+}
+available_dates = sorted(daily_file_by_date)
+available_symbols = sorted(trades["symbol"].unique().to_list())
+
+# T5 · 缓存一致性：路径、大小和修改时间共同形成数据版本。
+def lake_version():
+    parts = []
+    for path in daily_files:
+        stat = path.stat()
+        parts.append(f"{path.relative_to(LAKE)}:{stat.st_size}:{stat.st_mtime_ns}")
+    return hashlib.sha256("|".join(parts).encode()).hexdigest()[:12]
+
+# T3 · Polars Lazy：只有 collect() 才真正读取某一天的 Parquet。
+@lru_cache(maxsize=32)
+def cached_daily_summary(date_text, data_version):
+    path = daily_file_by_date[date_text]
+    return (
+        pl.scan_parquet(path)
+        .with_columns((pl.col("Price") * pl.col("Volume")).alias("turnover"))
+        .group_by("symbol")
+        .agg(
+            pl.len().alias("trades"),
+            pl.col("Volume").sum().alias("volume"),
+            pl.col("turnover").sum(),
+        )
+        .with_columns((pl.col("turnover") / pl.col("volume")).round(2).alias("vwap"))
+        .sort(["turnover", "symbol"], descending=[True, False])
+        .collect()
+    )
+
+def daily_summary(date_text):
+    # 数据文件变化时，lake_version 变化，自然形成一个新的缓存键。
+    return cached_daily_summary(date_text, lake_version())
+
+selected_date = "20260630"
+selected_path = daily_file_by_date[selected_date]
+polars_first = daily_summary(selected_date)   # 冷查询：miss
+cache_after_first = cached_daily_summary.cache_info()
+polars_second = daily_summary(selected_date)  # 相同日期和版本：hit
+cache_after_second = cached_daily_summary.cache_info()
+
+# T4 · DuckDB：独立用 SQL 计算同一结果，作为交叉核对。
+duckdb_top3 = connection.execute("""
+SELECT
+    symbol,
+    count(*) AS trades,
+    sum(Volume) AS volume,
+    sum(Price * Volume) AS turnover,
+    round(sum(Price * Volume)::DOUBLE / sum(Volume), 2) AS vwap
+FROM read_parquet(?)
+GROUP BY symbol
+ORDER BY turnover DESC, symbol
+LIMIT 3
+""", [str(selected_path)]).pl()
+
+columns = ["symbol", "trades", "volume", "turnover", "vwap"]
+polars_top3_rows = polars_second.select(columns).head(3).rows()
+duckdb_top3_rows = duckdb_top3.select(columns).rows()
+
+# T7 · 并发执行：六个互不依赖的日期文件可以并发读取和聚合。
+with ThreadPoolExecutor(max_workers=4) as pool:
+    summaries = dict(zip(available_dates, pool.map(daily_summary, available_dates)))
+
+# T6 · Zarr：把各日各股票的 VWAP 变成“日期 × 股票”二维数组。
+vwap_cube = np.empty((len(available_dates), len(available_symbols)), dtype="float32")
+for date_index, date_text in enumerate(available_dates):
+    values_by_symbol = dict(summaries[date_text].select("symbol", "vwap").iter_rows())
+    for symbol_index, symbol in enumerate(available_symbols):
+        vwap_cube[date_index, symbol_index] = values_by_symbol[symbol]
+
+vwap_array = zarr.create_array(
+    store=str(ZARR_STORE),
+    shape=vwap_cube.shape,
+    chunks=(1, 4),
+    shards=(2, 8),
+    dtype="float32",
+    zarr_format=3,
+)
+vwap_array[:] = vwap_cube
+vwap_array.attrs["dates"] = available_dates
+vwap_array.attrs["symbols"] = available_symbols
+reopened = zarr.open_array(str(ZARR_STORE), mode="r")
+
+# 最终只打印课堂上需要核对的事实，避免用不稳定的耗时作结论。
+print("输入:", trades.height, "行 /", len(available_dates), "天 /", len(available_symbols), "只股票")
+print("Parquet:", round(PARQUET.stat().st_size / 1024, 1), "KiB / 日期文件:", len(daily_files), "个")
+print("第一次查询:", cache_after_first)
+print("第二次查询:", cache_after_second)
+print("两次结果一致:", polars_first.equals(polars_second))
+print("Polars 与 DuckDB Top 3 一致:", polars_top3_rows == duckdb_top3_rows)
+print("20260630 按成交额 Top 3（价格单位：分）:")
+for symbol, trade_count, volume, turnover, vwap in duckdb_top3_rows:
+    print(f"  {symbol}: trades={trade_count}, volume={volume}, turnover={turnover}, vwap={vwap:.2f}")
+print("并发汇总:", len(summaries), "天，每天", summaries[selected_date].height, "只股票")
+print("Zarr shape/chunks/shards:", reopened.shape, reopened.chunks, reopened.shards)
+date_index = available_dates.index(selected_date)
+symbol_index = available_symbols.index("S002")
+print("Zarr[20260630, S002] VWAP:", round(float(reopened[date_index, symbol_index]), 2))
+print("最终缓存:", cached_daily_summary.cache_info())
+
+assert np.allclose(reopened[:], vwap_cube)
+assert polars_top3_rows == duckdb_top3_rows</code></pre></div>
+      <div class="run-result"><div class="run-result-head"><span>✓ 实际运行结果 · 完整流水线</span></div><pre>输入: 12000 行 / 6 天 / 8 只股票
+Parquet: 8.4 KiB / 日期文件: 6 个
+第一次查询: CacheInfo(hits=0, misses=1, maxsize=32, currsize=1)
+第二次查询: CacheInfo(hits=1, misses=1, maxsize=32, currsize=1)
+两次结果一致: True
+Polars 与 DuckDB Top 3 一致: True
+20260630 按成交额 Top 3（价格单位：分）:
+  S008: trades=250, volume=111900, turnover=133154600, vwap=1189.94
+  S007: trades=250, volume=111900, turnover=130357100, vwap=1164.94
+  S006: trades=250, volume=111900, turnover=127559600, vwap=1139.94
+并发汇总: 6 天，每天 8 只股票
+Zarr shape/chunks/shards: (6, 8) (1, 4) (2, 8)
+Zarr[20260630, S002] VWAP: 1039.94
+最终缓存: CacheInfo(hits=2, misses=6, maxsize=32, currsize=6)</pre><p class="run-note">结果不依赖计时：行数、文件数、Top 3、数组形状、缓存命中和两种查询实现的一致性都可以重复核对。</p></div>
+      <div class="foundation">
+        <h3>按输出顺序理解发生了什么</h3>
+        <div class="walkthrough">
+          <div class="walk-step"><b>先落盘：</b>12,000 行 CSV 被写为 8.4 KiB 的 ZSTD Parquet，再拆成 6 个日期文件。文件很小是因为数据是为课堂编造的高度规律小样本，不能据此推断真实行情的压缩率。</div>
+          <div class="walk-step"><b>定位一天：</b>日期目录被整理成“日期 → 文件”的映射；选择 <code>20260630</code> 后只读取当天的 <code>data_0.parquet</code>。</div>
+          <div class="walk-step"><b>计算并复用：</b>第一次查询产生 1 次 miss；第二次使用相同日期和数据版本，hits 从 0 变成 1，结果没有重新聚合。</div>
+          <div class="walk-step"><b>独立交叉核对：</b>Polars 表达式和 DuckDB SQL 都得到 S008、S007、S006，说明 Top 3 的筛选、排序和 VWAP 公式一致。</div>
+          <div class="walk-step"><b>扩展到全部日期：</b>线程池调度 6 份日汇总；其中 20260630 已在缓存内，所以最终共有 6 个 miss、2 个 hit 和 6 份缓存结果。</div>
+          <div class="walk-step"><b>变成数组：</b>最终 Zarr 的 <code>(6,8)</code> 表示 6 个日期 × 8 只股票；<code>[20260630, S002]</code> 对应的 VWAP 是 1039.94 分。</div>
+        </div>
+        <div class="why-box"><b>贯穿全文的关键不是“把所有库都用一遍”。</b>而是让每个工具只解决它擅长的问题，并在步骤之间留下可以核对的事实：文件数能数、两种查询能对比、缓存能统计、数组坐标能重新读取。</div>
+      </div>
+    </section>
+
+    <section class="closing" id="references">
+      <div class="topic-no">REFERENCES</div>
+      <h2>参考文献与官方文档</h2>
+      <ul class="source-list">
+        <li><a href="https://parquet.apache.org/docs/">Apache Parquet Documentation</a>：列式文件格式、编码、压缩与元数据。</li>
+        <li><a href="https://parquet.apache.org/docs/file-format/data-pages/compression/">Parquet Compression Specification</a>：页数据块的压缩层次、ZSTD、Snappy、LZ4_RAW 与已废弃的旧 LZ4 codec。</li>
+        <li><a href="https://parquet.apache.org/docs/file-format/implementationstatus/">Parquet Implementation Status</a>：不同查询引擎对压缩编解码器的读写支持状态。</li>
+        <li><a href="https://docs.pola.rs/api/python/stable/reference/api/polars.scan_csv.html">Polars scan_csv</a>：懒扫描、glob、谓词/投影下推。</li>
+        <li><a href="https://docs.pola.rs/docs/python/dev/reference/api/polars.DataFrame.write_parquet.html">Polars write_parquet</a>：ZSTD、Snappy、LZ4 等压缩与统计信息。</li>
+        <li><a href="https://duckdb.org/docs/current/data/partitioning/hive_partitioning">DuckDB Hive Partitioning</a>：<code>PARTITION_BY</code>、目录分区与分区过滤下推。</li>
+        <li><a href="https://duckdb.org/docs/stable/data/parquet/overview">DuckDB Parquet Overview</a>：多文件读取与 Parquet 参数。</li>
+        <li><a href="https://duckdb.org/docs/current/guides/meta/explain_analyze">DuckDB EXPLAIN ANALYZE</a>：执行计划和运行时分析。</li>
+        <li><a href="https://iceberg.apache.org/spec/">Apache Iceberg Specification</a>：快照、表元数据以及对 Parquet、Avro、ORC 文件的管理。</li>
+        <li><a href="https://docs.delta.io/">Delta Lake Documentation</a>：ACID 事务、Schema 约束、时间旅行与批流统一。</li>
+        <li><a href="https://hudi.apache.org/docs/concepts/">Apache Hudi Concepts</a>：Copy-on-Write、Merge-on-Read、快照与增量查询。</li>
+        <li><a href="https://lance.org/format/file/">Lance File Format</a>：面向对象存储、随机访问和 Arrow 数据模型的列式格式。</li>
+        <li><a href="https://docs.vortex.dev/concepts/file-format">Vortex File Format</a>：可扩展压缩编码、Chunk 布局与压缩数据计算。</li>
+        <li><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache">Python functools.lru_cache</a>：缓存容量、命中统计与缓存清理。</li>
+        <li><a href="https://zarr.readthedocs.io/en/stable/user-guide/arrays/">Zarr Working with Arrays</a>：持久化数组、Chunk、Shard 与 NumPy 风格切片。</li>
+        <li><a href="https://docs.python.org/3/howto/free-threading-python.html">Python Support for Free Threading</a>：Free-threaded 构建、GIL 状态检测和扩展兼容性。</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script>
+  const layout = document.querySelector('.layout');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebarPreferenceKey = 'student-handbook-sidebar';
+
+  function setSidebarHidden(hidden, remember = true) {
+    layout.classList.toggle('nav-hidden', hidden);
+    sidebarToggle.setAttribute('aria-expanded', String(!hidden));
+    sidebarToggle.setAttribute('aria-label', hidden ? '显示目录' : '隐藏目录');
+    sidebarToggle.querySelector('.toggle-icon').textContent = hidden ? '›' : '‹';
+    if (remember) {
+      try { localStorage.setItem(sidebarPreferenceKey, hidden ? 'hidden' : 'visible'); }
+      catch (_) { /* 本地文件禁用存储时仍可正常切换 */ }
+    }
+  }
+
+  try { setSidebarHidden(localStorage.getItem(sidebarPreferenceKey) === 'hidden', false); }
+  catch (_) { setSidebarHidden(false, false); }
+  sidebarToggle.addEventListener('click', () => setSidebarHidden(!layout.classList.contains('nav-hidden')));
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+
+  document.querySelectorAll('.copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.closest('.demo').querySelector('code').innerText;
+      try { await navigator.clipboard.writeText(text); }
+      catch (_) { fallbackCopy(text); }
+      const old = btn.textContent; btn.textContent = '已复制';
+      setTimeout(() => btn.textContent = old, 1200);
+    });
+  });
+
+  const links = [...document.querySelectorAll('nav a')];
+  const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const observer = new IntersectionObserver(entries => {
+    const visible = entries.filter(e => e.isIntersecting).sort((a,b) => b.intersectionRatio-a.intersectionRatio)[0];
+    if (!visible) return;
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + visible.target.id));
+  }, { rootMargin:'-15% 0px -70% 0px', threshold:[0,.1,.5] });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

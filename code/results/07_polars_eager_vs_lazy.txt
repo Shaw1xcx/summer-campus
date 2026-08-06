@@ -1,0 +1,28 @@
+优化后的 Lazy 计划：
+SORT BY [slice: (0, 10, dynamic_pred: 38abaae9-0fe0-48c7-8f10-695d70c9b1f2), descending: [true]] [col("amount_yuan")]
+  FILTER col("amount_yuan").dynamic_predicate()
+  FROM
+    AGGREGATE[maintain_order: false]
+      [col("Volume").sum().alias("volume"), [([(col("Price")) * (col("Volume"))]) / (100)].sum().alias("amount_yuan")] BY [col("symbol")]
+      FROM
+      Parquet SCAN [data/lake/year=2026/month=06/date=20260625/data_0.parquet, ... 5 other sources]
+      PROJECT 3/5 COLUMNS
+      SELECTION: [(col("Volume")) >= (100)]
+      ESTIMATED ROWS: 12000
+Eager: 0.015 s
+Lazy:  0.0247 s
+shape: (8, 3)
+┌────────┬────────┬─────────────┐
+│ symbol ┆ volume ┆ amount_yuan │
+│ ---    ┆ ---    ┆ ---         │
+│ str    ┆ i32    ┆ f64         │
+╞════════╪════════╪═════════════╡
+│ S008   ┆ 671400 ┆ 7.938921e6  │
+│ S007   ┆ 671400 ┆ 7.771071e6  │
+│ S006   ┆ 671400 ┆ 7.603221e6  │
+│ S005   ┆ 671400 ┆ 7.435371e6  │
+│ S004   ┆ 671400 ┆ 7.267521e6  │
+│ S003   ┆ 671400 ┆ 7.099671e6  │
+│ S002   ┆ 671400 ┆ 6.931821e6  │
+│ S001   ┆ 671400 ┆ 6.763971e6  │
+└────────┴────────┴─────────────┘

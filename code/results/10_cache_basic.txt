@@ -1,0 +1,3 @@
+v1 0.023291199933737516 CacheInfo(hits=0, misses=1, maxsize=128, currsize=1)
+v1 2.499902620911598e-06 CacheInfo(hits=1, misses=1, maxsize=128, currsize=1)
+v2 0.009189600008539855 CacheInfo(hits=1, misses=2, maxsize=128, currsize=2)

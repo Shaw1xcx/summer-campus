@@ -1,0 +1,2 @@
+unsafe: [True, True] final stock: -4
+safe  : [True, False] final stock: 3
